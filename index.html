@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>shenwenAI - 下一代人工智能</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="container header-content">
+            <a href="#" class="logo">
+                <svg class="logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 16h12M16 10v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="16" cy="16" r="6" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+                <span>shenwenAI</span>
+            </a>
+
+            <nav class="nav-links" id="navLinks">
+                <a href="#features">特性</a>
+                <a href="#models">模型</a>
+                <a href="payus.html">赞助我们</a>
+                <a href="#blog">博客</a>
+            </nav>
+
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"/>
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                    </svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                </button>
+                <a href="https://github.com/shenwenAI" class="github-link" target="_blank" aria-label="GitHub">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
+                    </svg>
+                </a>
+                <a href="https://huggingface.co/shenwenAI" class="huggingface-link" target="_blank" aria-label="HuggingFace">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" fill="currentColor" stroke="none"/>
+                    </svg>
+                </a>
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="菜单">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    shenwenAI 2.0 现已发布
+                </div>
+                <h1 class="hero-title">
+                    下一代<br>
+                    <span class="gradient-text">人工智能助手</span>
+                </h1>
+                <p class="hero-description">
+                    <span id="typewriter-text"></span><span class="cursor">|</span>
+                </p>
+                <div class="hero-actions">
+                    <a href="#" class="btn btn-primary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        开始对话
+                    </a>
+                    <a href="payus.html" class="btn btn-secondary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                        赞助我们
+                    </a>
+                </div>
+                <div class="hero-models">
+                    <span class="models-label">可用模型:</span>
+                    <div class="model-tags">
+                        <span class="model-tag">shenwen-chat</span>
+                        <span class="model-tag">shenwen-code</span>
+                        <span class="model-tag">shenwen-vision</span>
+                        <span class="model-tag">shenwen-math</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo Section -->
+            <div class="hero-demo">
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="demo-tabs">
+                            <button class="demo-tab active" data-lang="python">Python</button>
+                            <button class="demo-tab" data-lang="curl">cURL</button>
+                            <button class="demo-tab" data-lang="js">Node.js</button>
+                        </div>
+                        <button class="copy-btn" aria-label="复制代码">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="demo-content">
+                        <pre class="code-block"><code id="demoCode">import OpenAI from '@openai/openai';
+
+const client = new OpenAI({
+  apiKey: 'sk-...',
+  baseURL: 'https://api.shenwenai.com/v1'
+});
+
+const completion = await client.chat.completions.create({
+  model: 'shenwen-chat',
+  messages: [
+    { role: 'user', content: '你好，请介绍一下你自己' }
+  ]
+});
+
+console.log(completion.choices[0].message);</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">核心特性</h2>
+                <p class="section-description">
+                    shenwenAI 在多个维度展现出卓越的性能，为您的应用提供强大的AI支持
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                        </svg>
+                    </div>
+                    <h3>卓越性能</h3>
+                    <p>在多项基准测试中表现优异，包括MMLU、C-Eval、GSM8K等权威评测</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                        </svg>
+                    </div>
+                    <h3>全球部署</h3>
+                    <p>支持多区域部署，提供低延迟的API服务，满足全球化业务需求</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </div>
+                    <h3>安全可靠</h3>
+                    <p>企业级安全保障，支持数据加密传输，符合国际安全标准</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="16 18 22 12 16 6"/>
+                            <polyline points="8 6 2 12 8 18"/>
+                        </svg>
+                    </div>
+                    <h3>高效推理</h3>
+                    <p>优化的推理引擎，支持高速批量处理，大幅降低运营成本</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                    </div>
+                    <h3>多模态支持</h3>
+                    <p>支持文本、图像、音频等多种输入模态，满足复杂场景需求</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                            <line x1="12" y1="22.08" x2="12" y2="12"/>
+                        </svg>
+                    </div>
+                    <h3>灵活部署</h3>
+                    <p>支持云端API、私有化部署、边缘计算等多种使用方式</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Models Section -->
+    <section class="models" id="models">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">模型家族</h2>
+                <p class="section-description">
+                    多种规格的模型满足不同场景需求，从轻量级到超大规模
+                </p>
+            </div>
+
+            <div class="models-grid">
+                <div class="model-card">
+                    <div class="model-header">
+                        <h3>shenwen-chat</h3>
+                        <span class="model-badge">对话</span>
+                    </div>
+                    <div class="model-info">
+                        <div class="model-param">
+                            <span class="param-label">参数量</span>
+                            <span class="param-value">1.5B / 7B / 14B</span>
+                        </div>
+                        <div class="model-capability">
+                            <span class="capability-tag">对话</span>
+                            <span class="capability-tag">推理</span>
+                            <span class="capability-tag">创意</span>
+                        </div>
+                        <p class="model-desc">通用对话模型，适合聊天助手、内容创作等场景</p>
+                    </div>
+                    <div class="model-action">
+                        <a href="#" class="btn btn-outline">查看详情</a>
+                    </div>
+                </div>
+
+                <div class="model-card featured">
+                    <div class="featured-badge">推荐</div>
+                    <div class="model-header">
+                        <h3>shenwen-code</h3>
+                        <span class="model-badge">代码</span>
+                    </div>
+                    <div class="model-info">
+                        <div class="model-param">
+                            <span class="param-label">参数量</span>
+                            <span class="param-value">7B / 34B</span>
+                        </div>
+                        <div class="model-capability">
+                            <span class="capability-tag">代码生成</span>
+                            <span class="capability-tag">调试</span>
+                            <span class="capability-tag">解释</span>
+                        </div>
+                        <p class="model-desc">专业代码模型，支持多种编程语言，提升开发效率</p>
+                    </div>
+                    <div class="model-action">
+                        <a href="#" class="btn btn-primary">立即使用</a>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="model-header">
+                        <h3>shenwen-vision</h3>
+                        <span class="model-badge">视觉</span>
+                    </div>
+                    <div class="model-info">
+                        <div class="model-param">
+                            <span class="param-label">参数量</span>
+                            <span class="param-value">2B / 7B</span>
+                        </div>
+                        <div class="model-capability">
+                            <span class="capability-tag">图像理解</span>
+                            <span class="capability-tag">视觉问答</span>
+                            <span class="capability-tag">OCR</span>
+                        </div>
+                        <p class="model-desc">多模态视觉模型，支持图像分析和理解</p>
+                    </div>
+                    <div class="model-action">
+                        <a href="#" class="btn btn-outline">查看详情</a>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="model-header">
+                        <h3>shenwen-math</h3>
+                        <span class="model-badge">数学</span>
+                    </div>
+                    <div class="model-info">
+                        <div class="model-param">
+                            <span class="param-label">参数量</span>
+                            <span class="param-value">7B / 72B</span>
+                        </div>
+                        <div class="model-capability">
+                            <span class="capability-tag">数学推理</span>
+                            <span class="capability-tag">计算</span>
+                            <span class="capability-tag">证明</span>
+                        </div>
+                        <p class="model-desc">专业数学推理模型，解决复杂数学问题</p>
+                    </div>
+                    <div class="model-action">
+                        <a href="#" class="btn btn-outline">查看详情</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benchmarks Section -->
+    <section class="benchmarks">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">性能基准</h2>
+                <p class="section-description">
+                    在多个权威评测基准上的表现
+                </p>
+            </div>
+
+            <div class="benchmark-table-container">
+                <table class="benchmark-table">
+                    <thead>
+                        <tr>
+                            <th>模型</th>
+                            <th>MMLU</th>
+                            <th>C-Eval</th>
+                            <th>GSM8K</th>
+                            <th>HumanEval</th>
+                            <th>BBH</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="model-name">shenwen-chat-14B</td>
+                            <td><span class="score">78.5%</span></td>
+                            <td><span class="score">82.3%</span></td>
+                            <td><span class="score">74.2%</span></td>
+                            <td><span class="score">68.9%</span></td>
+                            <td><span class="score">71.5%</span></td>
+                        </tr>
+                        <tr>
+                            <td class="model-name">shenwen-chat-7B</td>
+                            <td><span class="score">72.1%</span></td>
+                            <td><span class="score">76.8%</span></td>
+                            <td><span class="score">67.5%</span></td>
+                            <td><span class="score">61.2%</span></td>
+                            <td><span class="score">65.8%</span></td>
+                        </tr>
+                        <tr>
+                            <td class="model-name">shenwen-code-7B</td>
+                            <td><span class="score">68.5%</span></td>
+                            <td><span class="score">72.1%</span></td>
+                            <td><span class="score">62.8%</span></td>
+                            <td><span class="score highlight">78.4%</span></td>
+                            <td><span class="score">62.3%</span></td>
+                        </tr>
+                        <tr>
+                            <td class="model-name">shenwen-math-72B</td>
+                            <td><span class="score highlight">85.2%</span></td>
+                            <td><span class="score highlight">88.7%</span></td>
+                            <td><span class="score highlight">92.6%</span></td>
+                            <td><span class="score">72.1%</span></td>
+                            <td><span class="score highlight">80.2%</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>准备好开始使用shenwenAI了吗？</h2>
+                <p>立即体验下一代人工智能的强大能力</p>
+                <div class="cta-actions">
+                    <a href="#" class="btn btn-white">免费开始</a>
+                    <a href="#" class="btn btn-outline-white">联系我们</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="#" class="logo">
+                        <svg class="logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
+                            <path d="M10 16h12M16 10v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="16" cy="16" r="6" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                        <span>shenwenAI</span>
+                    </a>
+                    <p>下一代人工智能助手，为开发者提供强大的AI能力</p>
+                    <div class="social-links">
+                        <a href="https://github.com/shenwenAI" target="_blank" aria-label="GitHub">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
+                            </svg>
+                        </a>
+                        <a href="#" aria-label="Twitter">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                            </svg>
+                        </a>
+                        <a href="#" aria-label="Discord">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <h4>产品</h4>
+                    <ul>
+                        <li><a href="#">模型</a></li>
+                        <li><a href="#">API</a></li>
+                        <li><a href="#">文档</a></li>
+                        <li><a href="#">定价</a></li>
+                        <li><a href="#">更新日志</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-links">
+                    <h4>资源</h4>
+                    <ul>
+                        <li><a href="#">快速开始</a></li>
+                        <li><a href="#">教程</a></li>
+                        <li><a href="#">示例</a></li>
+                        <li><a href="#">博客</a></li>
+                        <li><a href="#">社区</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-links">
+                    <h4>公司</h4>
+                    <ul>
+                        <li><a href="#">关于我们</a></li>
+                        <li><a href="#"> Careers</a></li>
+                        <li><a href="#">新闻</a></li>
+                        <li><a href="#">联系</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-links">
+                    <h4>法律</h4>
+                    <ul>
+                        <li><a href="#">隐私政策</a></li>
+                        <li><a href="#">服务条款</a></li>
+                        <li><a href="#">使用条款</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 shenwenAI. 保留所有权利。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
