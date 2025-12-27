@@ -1640,6 +1640,29 @@ html.dark .moon-icon {
     color: var(--text-muted);
 }
 
+.qr-image {
+    width: 160px;
+    height: 160px;
+    object-fit: contain;
+    margin: 0 auto 12px;
+    display: block;
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.qr-image:hover {
+    border-color: var(--brand-primary);
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.logo-image {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+}
+
 .sponsorship-tiers {
     padding: 80px 0;
     background: var(--bg-secondary);
