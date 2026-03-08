@@ -3,13 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>赞助我们 - shenwenAI</title>
+    <title>swllm.cpp - shenwenAI</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Sponsor Modal -->
+    <div class="sponsor-modal-overlay" id="sponsorModal">
+        <div class="sponsor-modal">
+            <div class="sponsor-modal-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+            </div>
+            <h3>赞助我们</h3>
+            <p>赞助我们或者为我们捐赠计算卡，帮助我们持续推进开源AI项目的研发与维护。</p>
+            <div class="sponsor-modal-actions">
+                <a href="payus.html" class="btn btn-primary" id="sponsorYes">是，前往赞助</a>
+                <button class="btn btn-secondary" id="sponsorDismiss">不再显示</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Header -->
     <header class="header" id="header">
         <div class="container header-content">
@@ -20,14 +37,13 @@
             <nav class="nav-links" id="navLinks">
                 <a href="index.html#features">特性</a>
                 <a href="index.html#models">模型</a>
-                <a href="swllm.html">swllm.cpp</a>
-                <a href="index.html#docs">文档</a>
-                <a href="index.html#pricing">定价</a>
-                <a href="payus.html" class="active">赞助我们</a>
-                <a href="#">博客</a>
+                <a href="swllm.html" class="active">swllm.cpp</a>
+                <a href="payus.html">赞助我们</a>
+                <a href="#blog">博客</a>
             </nav>
 
             <div class="header-actions">
+                <a href="swllm-en.html" class="lang-switch" title="Switch to English">EN</a>
                 <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
                     <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="5"/>
@@ -57,95 +73,145 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="payus-hero">
+    <section class="swllm-hero">
         <div class="container">
             <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    开源项目
+                </div>
                 <h1 class="hero-title">
-                    赞助我们
+                    swllm.cpp<br>
+                    <span class="gradient-text" id="swllm-typewriter"></span><span class="cursor">|</span>
                 </h1>
                 <p class="hero-description">
-                    与shenwenAI一起推动人工智能技术的发展<br>
-                    您的支持将帮助我们构建更强大的开源AI工具
+                    swllm.cpp 是 shenwenAI 推出的高性能 C/C++ 大语言模型推理引擎，<br>
+                    专为本地部署和边缘计算优化，支持多种模型格式和硬件加速。
                 </p>
+                <div class="hero-actions">
+                    <a href="https://github.com/shenwenAI/swllm.cpp" class="btn btn-primary" target="_blank">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
+                        </svg>
+                        在 GitHub 上查看
+                    </a>
+                    <a href="payus.html" class="btn btn-secondary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                        赞助我们
+                    </a>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Payment Methods Section -->
-    <section class="payment-methods">
+    <!-- License Section -->
+    <section class="license-section">
+        <div class="container">
+            <div class="license-card">
+                <div class="license-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                </div>
+                <h2>开源协议</h2>
+                <div class="license-name">MIT License</div>
+                <div class="license-text">
+                    <p id="license-typewriter"></p>
+                </div>
+                <a href="https://github.com/shenwenAI/swllm.cpp/blob/main/LICENSE" class="btn btn-outline" target="_blank">
+                    查看完整协议
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">赞助方式</h2>
+                <h2 class="section-title">核心特性</h2>
                 <p class="section-description">
-                    我们提供多种赞助方式，您可以根据自己的意愿选择最适合的方式支持我们
+                    swllm.cpp 提供高性能、轻量级的大语言模型推理解决方案
                 </p>
             </div>
 
-            <div class="payment-grid">
-                <div class="payment-card">
-                    <div class="payment-icon">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 4H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
-                            <line x1="1" y1="10" x2="23" y2="10"/>
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
                         </svg>
                     </div>
-                    <h3>GitHub Sponsors</h3>
-                    <p>通过GitHub Sponsors直接赞助我们，获得税收优惠和官方认证</p>
-                    <a href="https://github.com/sponsors/shenwenAI" class="btn btn-primary" target="_blank">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
-                        </svg>
-                        前往赞助
-                    </a>
+                    <h3>高性能推理</h3>
+                    <p>基于 C/C++ 实现，充分利用硬件性能，支持 AVX2、NEON 等 SIMD 指令集加速</p>
                 </div>
 
-                <div class="payment-card">
-                    <div class="payment-icon">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                    </div>
+                    <h3>本地部署</h3>
+                    <p>无需网络连接，支持在本地设备上运行大语言模型，保护数据隐私</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                            <line x1="12" y1="22.08" x2="12" y2="12"/>
+                        </svg>
+                    </div>
+                    <h3>多格式支持</h3>
+                    <p>支持 GGUF、GGML 等多种模型格式，兼容主流开源大语言模型</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="16 18 22 12 16 6"/>
+                            <polyline points="8 6 2 12 8 18"/>
+                        </svg>
+                    </div>
+                    <h3>量化优化</h3>
+                    <p>支持 4-bit、8-bit 等多种量化方案，在保持模型精度的同时大幅降低内存占用</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                        </svg>
+                    </div>
+                    <h3>跨平台</h3>
+                    <p>支持 Linux、macOS、Windows 等主流操作系统，可在多种硬件平台上运行</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                         </svg>
                     </div>
-                    <h3>支付宝</h3>
-                    <p>使用支付宝进行一次性赞助，方便快捷</p>
-                    <div class="qr-code">
-                        <img src="alipay.jpeg" alt="支付宝收款码" class="qr-image">
-                        <p class="qr-hint">扫码赞助</p>
-                    </div>
-                </div>
-
-                <div class="payment-card">
-                    <div class="payment-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                            <line x1="1" y1="10" x2="23" y2="10"/>
-                        </svg>
-                    </div>
-                    <h3>微信支付</h3>
-                    <p>使用微信进行赞助，支持人民币支付</p>
-                    <div class="qr-code">
-                        <img src="wechat.jpeg" alt="微信收款码" class="qr-image">
-                        <p class="qr-hint">扫码赞助</p>
-                    </div>
-                </div>
-
-                <div class="payment-card">
-                    <div class="payment-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 6v6l4 2"/>
-                        </svg>
-                    </div>
-                    <h3>按月赞助</h3>
-                    <p>成为我们的月度赞助商，获得专属权益和优先支持</p>
-                    <a href="https://github.com/sponsors/shenwenAI" class="btn btn-secondary" target="_blank">
-                        了解更多
-                    </a>
+                    <h3>开源免费</h3>
+                    <p>基于 MIT 协议开源，可自由使用、修改和分发，欢迎社区贡献</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- GitHub Section -->
+    <!-- GitHub Link Section -->
     <section class="github-section">
         <div class="container">
             <div class="github-content">
@@ -155,93 +221,42 @@
                             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
                         </svg>
                     </div>
-                    <h2>加入我们的GitHub组织</h2>
-                    <p>shenwenAI是一个开源项目，我们欢迎开发者加入我们的GitHub组织，参与项目贡献、讨论和协作</p>
-                    <a href="https://github.com/shenwenAI" class="btn btn-primary" target="_blank">
+                    <h2>在 GitHub 上参与贡献</h2>
+                    <p>swllm.cpp 是一个开源项目，我们欢迎开发者参与贡献代码、报告问题和分享想法</p>
+                    <a href="https://github.com/shenwenAI/swllm.cpp" class="btn btn-primary" target="_blank">
                         <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
                             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
                         </svg>
-                        访问 GitHub 组织
+                        访问 GitHub 仓库
                     </a>
                 </div>
                 <div class="github-stats">
                     <div class="stat-item">
-                        <span class="stat-number">15+</span>
-                        <span class="stat-label">开源项目</span>
+                        <span class="stat-number">C/C++</span>
+                        <span class="stat-label">开发语言</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number">500+</span>
-                        <span class="stat-label">贡献者</span>
+                        <span class="stat-number">MIT</span>
+                        <span class="stat-label">开源协议</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number">10K+</span>
-                        <span class="stat-label">Stars</span>
+                        <span class="stat-number">跨平台</span>
+                        <span class="stat-label">系统支持</span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- FAQ Section -->
-    <section class="faq-section">
+    <!-- CTA Section -->
+    <section class="cta-section">
         <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">常见问题</h2>
-                <p class="section-description">
-                    关于赞助的常见问题解答
-                </p>
-            </div>
-
-            <div class="faq-list">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>赞助资金会用在哪些地方？</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="6 9 12 15 18 9"/>
-                        </svg>
-                    </div>
-                    <div class="faq-answer">
-                        <p>赞助资金将主要用于：服务器和维护成本、开发者的日常开销、新功能的研发投入、文档和教程的制作，以及社区活动的组织。我们承诺每一笔资金都会用于推动shenwenAI项目的发展。</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>如何成为月度赞助商？</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="6 9 12 15 18 9"/>
-                        </svg>
-                    </div>
-                    <div class="faq-answer">
-                        <p>您可以通过GitHub Sponsors设置月度赞助。在我们的GitHub Sponsors页面选择您想要赞助的金额，然后按照指引完成设置即可。月度赞助可以随时取消或调整金额。</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>赞助商可以获得什么权益？</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="6 9 12 15 18 9"/>
-                        </svg>
-                    </div>
-                    <div class="faq-answer">
-                        <p>不同等级的赞助商将获得不同的权益，包括但不限于：官网Logo展示、GitHub组织致谢、专属技术支持频道、API调用额度、1对1技术咨询、联合新闻稿发布等。详情请查看赞助等级介绍。</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>如何联系赞助团队？</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="6 9 12 15 18 9"/>
-                        </svg>
-                    </div>
-                    <div class="faq-answer">
-                        <p>您可以通过以下方式联系我们：
-                        <br>邮箱：sponsor@shenwenai.com
-                        <br>GitHub：https://github.com/shenwenAI
-                        <br>我们会在24小时内回复您的咨询。</p>
-                    </div>
+            <div class="cta-content">
+                <h2>准备好体验 swllm.cpp 了吗？</h2>
+                <p>立即开始在本地运行大语言模型</p>
+                <div class="cta-actions">
+                    <a href="https://github.com/shenwenAI/swllm.cpp" class="btn btn-white" target="_blank">前往 GitHub</a>
+                    <a href="payus.html" class="btn btn-outline-white">赞助我们</a>
                 </div>
             </div>
         </div>
@@ -284,9 +299,9 @@
                     <h4>产品</h4>
                     <ul>
                         <li><a href="index.html#models">模型</a></li>
-                        <li><a href="index.html#docs">API</a></li>
-                        <li><a href="index.html#docs">文档</a></li>
-                        <li><a href="index.html#pricing">定价</a></li>
+                        <li><a href="#">API</a></li>
+                        <li><a href="#">文档</a></li>
+                        <li><a href="#">定价</a></li>
                         <li><a href="#">更新日志</a></li>
                     </ul>
                 </div>

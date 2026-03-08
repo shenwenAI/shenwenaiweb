@@ -398,19 +398,19 @@ console.log(data.choices[0].message);`
 
     // ==================== 打字机效果 ====================
     function initTypewriter() {
-        const typewriterElement = document.getElementById('typewriter-text');
+        var typewriterElement = document.getElementById('typewriter-text');
         if (!typewriterElement) return;
 
-        const phrases = ['人工智能助手', '代码生成工具', '多模态AI', '智能对话系统', '代码助手'];
-        let phraseIndex = 0;
-        let charIndex = 0;
-        let isDeleting = false;
-        let typeSpeed = 100;
-        let deleteSpeed = 50;
-        let pauseTime = 2000;
+        var phrases = ['人工智能助手', '代码生成工具', '多模态AI', '智能对话系统', '代码助手'];
+        var phraseIndex = 0;
+        var charIndex = 0;
+        var isDeleting = false;
+        var typeSpeed = 100;
+        var deleteSpeed = 50;
+        var pauseTime = 2000;
 
         function type() {
-            const currentPhrase = phrases[phraseIndex];
+            var currentPhrase = phrases[phraseIndex];
 
             if (isDeleting) {
                 typewriterElement.textContent = currentPhrase.substring(0, charIndex - 1);
@@ -435,9 +435,104 @@ console.log(data.choices[0].message);`
         type();
     }
 
+    // ==================== swllm.cpp 页面打字机效果 ====================
+    function initSwllmTypewriter() {
+        var swllmTypewriter = document.getElementById('swllm-typewriter');
+        if (!swllmTypewriter) return;
+
+        var isEnglish = document.documentElement.lang === 'en';
+        var phrases = isEnglish
+            ? ['High-Performance Inference', 'Local Deployment', 'Open Source & Free', 'Cross-Platform', 'Quantization Optimized']
+            : ['高性能推理引擎', '本地部署方案', '开源免费', '跨平台支持', '量化优化'];
+        var phraseIndex = 0;
+        var charIndex = 0;
+        var isDeleting = false;
+        var typeSpeed = 100;
+        var deleteSpeed = 50;
+        var pauseTime = 2000;
+
+        function type() {
+            var currentPhrase = phrases[phraseIndex];
+
+            if (isDeleting) {
+                swllmTypewriter.textContent = currentPhrase.substring(0, charIndex - 1);
+                charIndex--;
+                if (charIndex === 0) {
+                    isDeleting = false;
+                    phraseIndex = (phraseIndex + 1) % phrases.length;
+                    typeSpeed = 100;
+                }
+            } else {
+                swllmTypewriter.textContent = currentPhrase.substring(0, charIndex + 1);
+                charIndex++;
+                if (charIndex === currentPhrase.length) {
+                    isDeleting = true;
+                    typeSpeed = pauseTime;
+                }
+            }
+
+            setTimeout(type, isDeleting ? deleteSpeed : typeSpeed);
+        }
+
+        type();
+    }
+
+    // ==================== 开源协议打字机效果 ====================
+    function initLicenseTypewriter() {
+        var licenseElement = document.getElementById('license-typewriter');
+        if (!licenseElement) return;
+
+        var isEnglish = document.documentElement.lang === 'en';
+        var licenseText = isEnglish
+            ? 'MIT License\n\nCopyright (c) shenwenAI\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software.'
+            : 'MIT 许可证\n\nCopyright (c) shenwenAI\n\n特此免费授予获得本软件及相关文档文件（"软件"）副本的任何人不受限制地处理本软件的权利，包括但不限于使用、复制、修改、合并、发布、分发、再许可和/或销售本软件的副本的权利。';
+
+        var charIndex = 0;
+        var speed = 30;
+
+        function type() {
+            if (charIndex < licenseText.length) {
+                licenseElement.textContent = licenseText.substring(0, charIndex + 1);
+                charIndex++;
+                setTimeout(type, speed);
+            }
+        }
+
+        type();
+    }
+
+    // ==================== 赞助弹窗功能 ====================
+    function initSponsorModal() {
+        var modal = document.getElementById('sponsorModal');
+        var dismissBtn = document.getElementById('sponsorDismiss');
+
+        if (!modal || !dismissBtn) return;
+
+        var dismissed = localStorage.getItem('sponsorDismissed');
+        if (dismissed === 'true') return;
+
+        setTimeout(function() {
+            modal.classList.add('active');
+        }, 1000);
+
+        dismissBtn.addEventListener('click', function() {
+            modal.classList.remove('active');
+            localStorage.setItem('sponsorDismissed', 'true');
+        });
+
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    }
+
     // 在页面加载完成后初始化打字机效果
     window.addEventListener('load', function() {
         setTimeout(initTypewriter, 500);
+        setTimeout(initSwllmTypewriter, 500);
+        setTimeout(initLicenseTypewriter, 800);
+        initSponsorModal();
     });
 
 })();
