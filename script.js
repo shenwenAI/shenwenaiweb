@@ -398,19 +398,19 @@ console.log(data.choices[0].message);`
 
     // ==================== 打字机效果 ====================
     function initTypewriter() {
-        var typewriterElement = document.getElementById('typewriter-text');
+        const typewriterElement = document.getElementById('typewriter-text');
         if (!typewriterElement) return;
 
-        var phrases = ['人工智能助手', '代码生成工具', '多模态AI', '智能对话系统', '代码助手'];
-        var phraseIndex = 0;
-        var charIndex = 0;
-        var isDeleting = false;
-        var typeSpeed = 100;
-        var deleteSpeed = 50;
-        var pauseTime = 2000;
+        const phrases = ['人工智能助手', '代码生成工具', '多模态AI', '智能对话系统', '代码助手'];
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let typeSpeed = 100;
+        const deleteSpeed = 50;
+        const pauseTime = 2000;
 
         function type() {
-            var currentPhrase = phrases[phraseIndex];
+            const currentPhrase = phrases[phraseIndex];
 
             if (isDeleting) {
                 typewriterElement.textContent = currentPhrase.substring(0, charIndex - 1);
@@ -437,22 +437,22 @@ console.log(data.choices[0].message);`
 
     // ==================== swllm.cpp 页面打字机效果 ====================
     function initSwllmTypewriter() {
-        var swllmTypewriter = document.getElementById('swllm-typewriter');
+        const swllmTypewriter = document.getElementById('swllm-typewriter');
         if (!swllmTypewriter) return;
 
-        var isEnglish = document.documentElement.lang === 'en';
-        var phrases = isEnglish
+        const isEnglish = document.documentElement.lang === 'en';
+        const phrases = isEnglish
             ? ['High-Performance Inference', 'Local Deployment', 'Open Source & Free', 'Cross-Platform', 'Quantization Optimized']
             : ['高性能推理引擎', '本地部署方案', '开源免费', '跨平台支持', '量化优化'];
-        var phraseIndex = 0;
-        var charIndex = 0;
-        var isDeleting = false;
-        var typeSpeed = 100;
-        var deleteSpeed = 50;
-        var pauseTime = 2000;
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let typeSpeed = 100;
+        const deleteSpeed = 50;
+        const pauseTime = 2000;
 
         function type() {
-            var currentPhrase = phrases[phraseIndex];
+            const currentPhrase = phrases[phraseIndex];
 
             if (isDeleting) {
                 swllmTypewriter.textContent = currentPhrase.substring(0, charIndex - 1);
@@ -479,16 +479,16 @@ console.log(data.choices[0].message);`
 
     // ==================== 开源协议打字机效果 ====================
     function initLicenseTypewriter() {
-        var licenseElement = document.getElementById('license-typewriter');
+        const licenseElement = document.getElementById('license-typewriter');
         if (!licenseElement) return;
 
-        var isEnglish = document.documentElement.lang === 'en';
-        var licenseText = isEnglish
+        const isEnglish = document.documentElement.lang === 'en';
+        const licenseText = isEnglish
             ? 'MIT License\n\nCopyright (c) shenwenAI\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software.'
             : 'MIT 许可证\n\nCopyright (c) shenwenAI\n\n特此免费授予获得本软件及相关文档文件（"软件"）副本的任何人不受限制地处理本软件的权利，包括但不限于使用、复制、修改、合并、发布、分发、再许可和/或销售本软件的副本的权利。';
 
-        var charIndex = 0;
-        var speed = 30;
+        let charIndex = 0;
+        const speed = 30;
 
         function type() {
             if (charIndex < licenseText.length) {
@@ -503,12 +503,12 @@ console.log(data.choices[0].message);`
 
     // ==================== 赞助弹窗功能 ====================
     function initSponsorModal() {
-        var modal = document.getElementById('sponsorModal');
-        var dismissBtn = document.getElementById('sponsorDismiss');
+        const modal = document.getElementById('sponsorModal');
+        const dismissBtn = document.getElementById('sponsorDismiss');
 
         if (!modal || !dismissBtn) return;
 
-        var dismissed = localStorage.getItem('sponsorDismissed');
+        const dismissed = localStorage.getItem('sponsorDismissed');
         if (dismissed === 'true') return;
 
         setTimeout(function() {
