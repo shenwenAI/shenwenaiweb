@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="light">
+<html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>shenwenAI - 下一代人工智能</title>
+    <title>shenwenAI - Next Generation AI</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,11 +18,11 @@
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                 </svg>
             </div>
-            <h3>赞助我们</h3>
-            <p>赞助我们或者为我们捐赠计算卡，帮助我们持续推进开源AI项目的研发与维护。</p>
+            <h3>Support Us</h3>
+            <p>Sponsor us or donate computing cards to help us continuously advance the development and maintenance of open-source AI projects.</p>
             <div class="sponsor-modal-actions">
-                <a href="payus.html" class="btn btn-primary" id="sponsorYes">是，前往赞助</a>
-                <button class="btn btn-secondary" id="sponsorDismiss">不再显示</button>
+                <a href="payus-en.html" class="btn btn-primary" id="sponsorYes">Yes, Go to Sponsor</a>
+                <button class="btn btn-secondary" id="sponsorDismiss">Don't Show Again</button>
             </div>
         </div>
     </div>
@@ -30,19 +30,19 @@
     <!-- Header -->
     <header class="header" id="header">
         <div class="container header-content">
-            <a href="index.html" class="logo">
+            <a href="index-en.html" class="logo">
                 <img src="shenwenAI.jpeg" alt="shenwenAI Logo" class="logo-image">
             </a>
 
             <nav class="nav-links" id="navLinks">
-                <a href="#features">特性</a>
-                <a href="payus.html">赞助我们</a>
-                <a href="blog.html">博客</a>
+                <a href="#features">Features</a>
+                <a href="payus-en.html">Sponsor Us</a>
+                <a href="blog-en.html">Blog</a>
             </nav>
 
             <div class="header-actions">
-                <a href="index-en.html" class="lang-switch" title="Switch to English">EN</a>
-                <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
+                <a href="index.html" class="lang-switch" title="切换到中文">中</a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
                     <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="5"/>
                         <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
@@ -61,7 +61,7 @@
                         <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zM8.5 9a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm7 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm-8 6h9s-1 3-4.5 3-4.5-3-4.5-3z"/>
                     </svg>
                 </a>
-                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="菜单">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Menu">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -76,28 +76,28 @@
             <div class="hero-content">
                 <div class="hero-badge">
                     <span class="badge-dot"></span>
-                    开源项目
+                    Open Source Project
                 </div>
                 <h1 class="hero-title">
                     swllm.cpp<br>
                     <span class="gradient-text" id="swllm-typewriter"></span><span class="cursor">|</span>
                 </h1>
                 <p class="hero-description">
-                    swllm.cpp 是 shenwenAI 推出的高性能 C/C++ 大语言模型推理引擎，<br>
-                    专为本地部署和边缘计算优化，支持多种模型格式和硬件加速。
+                    swllm.cpp is a high-performance C/C++ LLM inference engine by shenwenAI,<br>
+                    optimized for local deployment and edge computing, supporting multiple model formats and hardware acceleration.
                 </p>
                 <div class="hero-actions">
                     <a href="https://github.com/shenwenAI/swllm.cpp" class="btn btn-primary" target="_blank">
                         <svg viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
                         </svg>
-                        在 GitHub 上查看
+                        View on GitHub
                     </a>
-                    <a href="payus.html" class="btn btn-secondary">
+                    <a href="payus-en.html" class="btn btn-secondary">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                         </svg>
-                        赞助我们
+                        Sponsor Us
                     </a>
                 </div>
             </div>
@@ -117,13 +117,13 @@
                         <polyline points="10 9 9 9 8 9"/>
                     </svg>
                 </div>
-                <h2>开源协议</h2>
+                <h2>Open Source License</h2>
                 <div class="license-name">MIT License</div>
                 <div class="license-text">
                     <p id="license-typewriter"></p>
                 </div>
                 <a href="https://github.com/shenwenAI/swllm.cpp/blob/main/LICENSE" class="btn btn-outline" target="_blank">
-                    查看完整协议
+                    View Full License
                 </a>
             </div>
         </div>
@@ -133,9 +133,9 @@
     <section class="features" id="features">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">核心特性</h2>
+                <h2 class="section-title">Core Features</h2>
                 <p class="section-description">
-                    swllm.cpp 提供高性能、轻量级的大语言模型推理解决方案
+                    swllm.cpp provides high-performance, lightweight LLM inference solutions
                 </p>
             </div>
 
@@ -146,8 +146,8 @@
                             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
                         </svg>
                     </div>
-                    <h3>高性能推理</h3>
-                    <p>基于 C/C++ 实现，充分利用硬件性能，支持 AVX2、NEON 等 SIMD 指令集加速</p>
+                    <h3>High-Performance Inference</h3>
+                    <p>Built with C/C++ for maximum hardware utilization, supporting AVX2, NEON and other SIMD instruction sets</p>
                 </div>
 
                 <div class="feature-card">
@@ -158,8 +158,8 @@
                             <line x1="12" y1="17" x2="12" y2="21"/>
                         </svg>
                     </div>
-                    <h3>本地部署</h3>
-                    <p>无需网络连接，支持在本地设备上运行大语言模型，保护数据隐私</p>
+                    <h3>Local Deployment</h3>
+                    <p>No network connection required, run LLMs on local devices to protect data privacy</p>
                 </div>
 
                 <div class="feature-card">
@@ -170,8 +170,8 @@
                             <line x1="12" y1="22.08" x2="12" y2="12"/>
                         </svg>
                     </div>
-                    <h3>多格式支持</h3>
-                    <p>支持 GGUF、GGML 等多种模型格式，兼容主流开源大语言模型</p>
+                    <h3>Multi-Format Support</h3>
+                    <p>Supports GGUF, GGML and other model formats, compatible with mainstream open-source LLMs</p>
                 </div>
 
                 <div class="feature-card">
@@ -181,8 +181,8 @@
                             <polyline points="8 6 2 12 8 18"/>
                         </svg>
                     </div>
-                    <h3>量化优化</h3>
-                    <p>支持 4-bit、8-bit 等多种量化方案，在保持模型精度的同时大幅降低内存占用</p>
+                    <h3>Quantization Optimization</h3>
+                    <p>Supports 4-bit, 8-bit and other quantization schemes, significantly reducing memory usage while maintaining accuracy</p>
                 </div>
 
                 <div class="feature-card">
@@ -192,8 +192,8 @@
                             <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
                         </svg>
                     </div>
-                    <h3>跨平台</h3>
-                    <p>支持 Linux、macOS、Windows 等主流操作系统，可在多种硬件平台上运行</p>
+                    <h3>Cross-Platform</h3>
+                    <p>Supports Linux, macOS, Windows and other major operating systems across multiple hardware platforms</p>
                 </div>
 
                 <div class="feature-card">
@@ -202,8 +202,8 @@
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                         </svg>
                     </div>
-                    <h3>开源免费</h3>
-                    <p>基于 MIT 协议开源，可自由使用、修改和分发，欢迎社区贡献</p>
+                    <h3>Open Source & Free</h3>
+                    <p>Licensed under MIT, free to use, modify and distribute. Community contributions are welcome</p>
                 </div>
             </div>
         </div>
@@ -219,27 +219,27 @@
                             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
                         </svg>
                     </div>
-                    <h2>在 GitHub 上参与贡献</h2>
-                    <p>swllm.cpp 是一个开源项目，我们欢迎开发者参与贡献代码、报告问题和分享想法</p>
+                    <h2>Contribute on GitHub</h2>
+                    <p>swllm.cpp is an open-source project. We welcome developers to contribute code, report issues, and share ideas</p>
                     <a href="https://github.com/shenwenAI/swllm.cpp" class="btn btn-primary" target="_blank">
                         <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
                             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
                         </svg>
-                        访问 GitHub 仓库
+                        Visit GitHub Repository
                     </a>
                 </div>
                 <div class="github-stats">
                     <div class="stat-item">
                         <span class="stat-number">C/C++</span>
-                        <span class="stat-label">开发语言</span>
+                        <span class="stat-label">Language</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-number">MIT</span>
-                        <span class="stat-label">开源协议</span>
+                        <span class="stat-label">License</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number">跨平台</span>
-                        <span class="stat-label">系统支持</span>
+                        <span class="stat-number">Cross-Platform</span>
+                        <span class="stat-label">Support</span>
                     </div>
                 </div>
             </div>
@@ -250,11 +250,11 @@
     <section class="cta-section">
         <div class="container">
             <div class="cta-content">
-                <h2>准备好体验 swllm.cpp 了吗？</h2>
-                <p>立即开始在本地运行大语言模型</p>
+                <h2>Ready to try swllm.cpp?</h2>
+                <p>Start running large language models locally today</p>
                 <div class="cta-actions">
-                    <a href="https://github.com/shenwenAI/swllm.cpp" class="btn btn-white" target="_blank">前往 GitHub</a>
-                    <a href="payus.html" class="btn btn-outline-white">赞助我们</a>
+                    <a href="https://github.com/shenwenAI/swllm.cpp" class="btn btn-white" target="_blank">Go to GitHub</a>
+                    <a href="payus-en.html" class="btn btn-outline-white">Sponsor Us</a>
                 </div>
             </div>
         </div>
@@ -265,7 +265,7 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <a href="index.html" class="logo">
+                    <a href="index-en.html" class="logo">
                         <svg class="logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
                             <path d="M10 16h12M16 10v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -273,7 +273,7 @@
                         </svg>
                         <span>shenwenAI</span>
                     </a>
-                    <p>下一代人工智能助手，为开发者提供强大的AI能力</p>
+                    <p>Next-generation AI assistant, providing powerful AI capabilities for developers</p>
                     <div class="social-links">
                         <a href="https://github.com/shenwenAI" target="_blank" aria-label="GitHub">
                             <svg viewBox="0 0 24 24" fill="currentColor">
@@ -294,50 +294,50 @@
                 </div>
 
                 <div class="footer-links">
-                    <h4>产品</h4>
+                    <h4>Products</h4>
                     <ul>
-                        <li><a href="index.html">swllm.cpp</a></li>
+                        <li><a href="index-en.html">swllm.cpp</a></li>
                         <li><a href="#">API</a></li>
-                        <li><a href="#">文档</a></li>
-                        <li><a href="#">定价</a></li>
-                        <li><a href="#">更新日志</a></li>
+                        <li><a href="#">Docs</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Changelog</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-links">
-                    <h4>资源</h4>
+                    <h4>Resources</h4>
                     <ul>
-                        <li><a href="#">快速开始</a></li>
-                        <li><a href="#">教程</a></li>
-                        <li><a href="#">示例</a></li>
-                        <li><a href="blog.html">博客</a></li>
-                        <li><a href="#">社区</a></li>
+                        <li><a href="#">Quick Start</a></li>
+                        <li><a href="#">Tutorials</a></li>
+                        <li><a href="#">Examples</a></li>
+                        <li><a href="blog-en.html">Blog</a></li>
+                        <li><a href="#">Community</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-links">
-                    <h4>公司</h4>
+                    <h4>Company</h4>
                     <ul>
-                        <li><a href="#">关于我们</a></li>
-                        <li><a href="#">招聘</a></li>
-                        <li><a href="#">新闻</a></li>
-                        <li><a href="payus.html">赞助我们</a></li>
-                        <li><a href="#">联系</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">News</a></li>
+                        <li><a href="payus-en.html">Sponsor Us</a></li>
+                        <li><a href="#">Contact</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-links">
-                    <h4>法律</h4>
+                    <h4>Legal</h4>
                     <ul>
-                        <li><a href="#">隐私政策</a></li>
-                        <li><a href="#">服务条款</a></li>
-                        <li><a href="#">使用条款</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Terms of Use</a></li>
                     </ul>
                 </div>
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; 2025 shenwenAI. 保留所有权利。</p>
+                <p>&copy; 2025 shenwenAI. All rights reserved.</p>
             </div>
         </div>
     </footer>
