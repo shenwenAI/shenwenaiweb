@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>shenwenAI - 下一代人工智能</title>
+    <title>shenwen-coder-0.5b - shenwenAI</title>
     <link rel="icon" type="image/png" href="shenwenAI.png">
     <link rel="apple-touch-icon" sizes="180x180" href="shenwenAI.png">
     <link rel="stylesheet" href="styles.css">
@@ -37,14 +37,14 @@
             </a>
 
             <nav class="nav-links" id="navLinks">
-                <a href="#features">特性</a>
-                <a href="model.html">模型</a>
+                <a href="index.html#features">特性</a>
+                <a href="model.html" class="active">模型</a>
                 <a href="payus.html">赞助我们</a>
                 <a href="blog.html">博客</a>
             </nav>
 
             <div class="header-actions">
-                <a href="index-en.html" class="lang-switch" title="Switch to English">EN</a>
+                <a href="model-en.html" class="lang-switch" title="Switch to English">EN</a>
                 <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
                     <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="5"/>
@@ -74,27 +74,26 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="swllm-hero">
+    <section class="model-hero">
         <div class="container">
             <div class="hero-content">
                 <div class="hero-badge">
                     <span class="badge-dot"></span>
-                    开源项目
+                    最新模型
                 </div>
                 <h1 class="hero-title">
-                    swllm.cpp<br>
-                    <span class="gradient-text" id="swllm-typewriter"></span><span class="cursor">|</span>
+                    shenwen-coder-0.5b
                 </h1>
                 <p class="hero-description">
-                    swllm.cpp 是 shenwenAI 推出的高性能 C/C++ 大语言模型推理引擎，<br>
-                    专为本地部署和边缘计算优化，支持多种模型格式和硬件加速。
+                    shenwenAI 推出的轻量级代码补全模型，拥有 5 亿参数，<br>
+                    专为代码补全场景优化，可在本地设备高效运行。
                 </p>
                 <div class="hero-actions">
-                    <a href="https://github.com/shenwenAI/swllm.cpp" class="btn btn-primary" target="_blank">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
+                    <a href="https://huggingface.co/shenwenAI/shenwen-coder-0.5b" class="btn btn-primary" target="_blank">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                            <path d="M12.025 1.13c-5.77 0-10.449 4.647-10.449 10.378 0 1.112.178 2.181.503 3.185.064-.222.203-.444.416-.577a.96.96 0 0 1 .524-.15c.293 0 .584.124.84.284.278.173.48.408.71.694.226.282.458.611.684.951v-.014c.017-.324.106-.622.264-.874s.403-.487.762-.543c.3-.047.596.06.787.203s.31.313.4.467c.15.257.212.468.233.542.01.026.653 1.552 1.657 2.54.616.605 1.01 1.223 1.082 1.912.055.537-.096 1.059-.38 1.572.637.121 1.294.187 1.967.187.657 0 1.298-.063 1.921-.178-.287-.517-.44-1.041-.384-1.581.07-.69.465-1.307 1.081-1.913 1.004-.987 1.647-2.513 1.657-2.539.021-.074.083-.285.233-.542.09-.154.208-.323.4-.467a1.08 1.08 0 0 1 .787-.203c.359.056.604.29.762.543s.247.55.265.874v.015c.225-.34.457-.67.683-.952.23-.286.432-.52.71-.694.257-.16.547-.284.84-.285a.97.97 0 0 1 .524.151c.228.143.373.388.43.625l.006.04a10.3 10.3 0 0 0 .534-3.273c0-5.731-4.678-10.378-10.449-10.378M8.327 6.583a1.5 1.5 0 0 1 .713.174 1.487 1.487 0 0 1 .617 2.013c-.183.343-.762-.214-1.102-.094-.38.134-.532.914-.917.71a1.487 1.487 0 0 1 .69-2.803m7.486 0a1.487 1.487 0 0 1 .689 2.803c-.385.204-.536-.576-.916-.71-.34-.12-.92.437-1.103.094a1.487 1.487 0 0 1 .617-2.013 1.5 1.5 0 0 1 .713-.174m-10.68 1.55a.96.96 0 1 1 0 1.921.96.96 0 0 1 0-1.92m13.838 0a.96.96 0 1 1 0 1.92.96.96 0 0 1 0-1.92M8.489 11.458c.588.01 1.965 1.157 3.572 1.164 1.607-.007 2.984-1.155 3.572-1.164.196-.003.305.12.305.454 0 .886-.424 2.328-1.563 3.202-.22-.756-1.396-1.366-1.63-1.32q-.011.001-.02.006l-.044.026-.01.008-.03.024q-.018.017-.035.036l-.032.04a1 1 0 0 0-.058.09l-.014.025q-.049.088-.11.19a1 1 0 0 1-.083.116 1.2 1.2 0 0 1-.173.18q-.035.029-.075.058a1.3 1.3 0 0 1-.251-.243 1 1 0 0 1-.076-.107c-.124-.193-.177-.363-.337-.444-.034-.016-.104-.008-.2.022q-.094.03-.216.087-.06.028-.125.063l-.13.074q-.067.04-.136.086a3 3 0 0 0-.135.096 3 3 0 0 0-.26.219 2 2 0 0 0-.12.121 2 2 0 0 0-.106.128l-.002.002a2 2 0 0 0-.09.132l-.001.001a1.2 1.2 0 0 0-.105.212q-.013.036-.024.073c-1.139-.875-1.563-2.317-1.563-3.203 0-.334.109-.457.305-.454m.836 10.354c.824-1.19.766-2.082-.365-3.194-1.13-1.112-1.789-2.738-1.789-2.738s-.246-.945-.806-.858-.97 1.499.202 2.362c1.173.864-.233 1.45-.685.64-.45-.812-1.683-2.896-2.322-3.295s-1.089-.175-.938.647 2.822 2.813 2.562 3.244-1.176-.506-1.176-.506-2.866-2.567-3.49-1.898.473 1.23 2.037 2.16c1.564.932 1.686 1.178 1.464 1.53s-3.675-2.511-4-1.297c-.323 1.214 3.524 1.567 3.287 2.405-.238.839-2.71-1.587-3.216-.642-.506.946 3.49 2.056 3.522 2.064 1.29.33 4.568 1.028 5.713-.624m5.349 0c-.824-1.19-.766-2.082.365-3.194 1.13-1.112 1.789-2.738 1.789-2.738s.246-.945.806-.858.97 1.499-.202 2.362c-1.173.864.233 1.45.685.64.451-.812 1.683-2.896 2.322-3.295s1.089-.175.938.647-2.822 2.813-2.562 3.244 1.176-.506 1.176-.506 2.866-2.567 3.49-1.898-.473 1.23-2.037 2.16c-1.564.932-1.686 1.178-1.464 1.53s3.675-2.511 4-1.297c.323 1.214-3.524 1.567-3.287 2.405.238.839 2.71-1.587 3.216-.642.506.946-3.49 2.056-3.522 2.064-1.29.33-4.568 1.028-5.713-.624"/>
                         </svg>
-                        在 GitHub 上查看
+                        在 HuggingFace 上查看
                     </a>
                     <a href="payus.html" class="btn btn-secondary">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -107,27 +106,70 @@
         </div>
     </section>
 
-    <!-- License Section -->
-    <section class="license-section">
+    <!-- Model Overview Section -->
+    <section class="model-overview">
         <div class="container">
-            <div class="license-card">
-                <div class="license-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/>
-                        <line x1="16" y1="17" x2="8" y2="17"/>
-                        <polyline points="10 9 9 9 8 9"/>
-                    </svg>
+            <div class="model-overview-grid">
+                <div class="model-overview-info">
+                    <h2>模型概览</h2>
+                    <p>
+                        shenwen-coder-0.5b 是 shenwenAI 推出的首款开源代码补全模型。
+                        该模型拥有 5 亿参数，经过大规模代码语料预训练与代码补全场景的专项微调，
+                        能够根据上下文精准预测并补全代码，显著提升开发效率。
+                        凭借轻量化的架构设计，模型可在普通 CPU 或消费级 GPU 上流畅运行，
+                        真正实现本地化、低延迟的智能代码补全体验。
+                    </p>
+                    <div class="model-meta-table">
+                        <div class="model-meta-row">
+                            <span class="model-meta-label">参数量</span>
+                            <span class="model-meta-value">0.5B（5 亿）</span>
+                        </div>
+                        <div class="model-meta-row">
+                            <span class="model-meta-label">模型类型</span>
+                            <span class="model-meta-value">代码补全</span>
+                        </div>
+                        <div class="model-meta-row">
+                            <span class="model-meta-label">架构</span>
+                            <span class="model-meta-value">Transformer（Decoder-only）</span>
+                        </div>
+                        <div class="model-meta-row">
+                            <span class="model-meta-label">开源协议</span>
+                            <span class="model-meta-value">Apache 2.0</span>
+                        </div>
+                        <div class="model-meta-row">
+                            <span class="model-meta-label">发布组织</span>
+                            <span class="model-meta-value">shenwenAI</span>
+                        </div>
+                        <div class="model-meta-row">
+                            <span class="model-meta-label">支持语言</span>
+                            <div class="model-tags-list">
+                                <span class="model-tag-item">Python</span>
+                                <span class="model-tag-item">JavaScript</span>
+                                <span class="model-tag-item">C/C++</span>
+                                <span class="model-tag-item">Java</span>
+                                <span class="model-tag-item">Go</span>
+                                <span class="model-tag-item">Rust</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <h2>开源协议</h2>
-                <div class="license-name">MIT License</div>
-                <div class="license-text">
-                    <p id="license-typewriter"></p>
+
+                <div class="model-overview-code">
+                    <h3>代码补全示例</h3>
+                    <div class="code-preview">
+                        <div class="code-header">Python · 函数补全</div>
+                        <pre><code><span class="comment"># 输入上下文（已有代码）</span>
+<span class="keyword">def</span> <span class="function">bubble_sort</span>(arr):
+    n = <span class="function">len</span>(arr)
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(n):
+
+<span class="comment"># ↓ shenwen-coder-0.5b 自动补全</span>
+        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="function">range</span>(0, n - i - 1):
+            <span class="keyword">if</span> arr[j] &gt; arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+    <span class="keyword">return</span> arr</code></pre>
+                    </div>
                 </div>
-                <a href="https://github.com/shenwenAI/swllm.cpp/blob/main/LICENSE" class="btn btn-outline" target="_blank">
-                    查看完整协议
-                </a>
             </div>
         </div>
     </section>
@@ -136,9 +178,9 @@
     <section class="features" id="features">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">核心特性</h2>
+                <h2 class="section-title">核心能力</h2>
                 <p class="section-description">
-                    swllm.cpp 提供高性能、轻量级的大语言模型推理解决方案
+                    shenwen-coder-0.5b 专为代码补全场景深度优化
                 </p>
             </div>
 
@@ -146,11 +188,22 @@
                 <div class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="16 18 22 12 16 6"/>
+                            <polyline points="8 6 2 12 8 18"/>
+                        </svg>
+                    </div>
+                    <h3>智能代码补全</h3>
+                    <p>理解当前代码上下文，精准预测下一行乃至多行代码，支持函数体、类方法、逻辑块等多种场景的自动补全。</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
                         </svg>
                     </div>
-                    <h3>高性能推理</h3>
-                    <p>基于 C/C++ 实现，充分利用硬件性能，支持 AVX2、NEON 等 SIMD 指令集加速</p>
+                    <h3>低延迟推理</h3>
+                    <p>0.5B 的轻量化参数规模确保极低推理延迟，可在普通 CPU 上实时响应，无需高端 GPU 即可获得流畅的补全体验。</p>
                 </div>
 
                 <div class="feature-card">
@@ -161,8 +214,8 @@
                             <line x1="12" y1="17" x2="12" y2="21"/>
                         </svg>
                     </div>
-                    <h3>本地部署</h3>
-                    <p>无需网络连接，支持在本地设备上运行大语言模型，保护数据隐私</p>
+                    <h3>本地私有部署</h3>
+                    <p>模型完全在本地运行，代码数据不出设备，保护企业与个人的代码隐私安全，无需担心数据泄露。</p>
                 </div>
 
                 <div class="feature-card">
@@ -173,19 +226,8 @@
                             <line x1="12" y1="22.08" x2="12" y2="12"/>
                         </svg>
                     </div>
-                    <h3>多格式支持</h3>
-                    <p>支持 GGUF、GGML 等多种模型格式，兼容主流开源大语言模型</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="16 18 22 12 16 6"/>
-                            <polyline points="8 6 2 12 8 18"/>
-                        </svg>
-                    </div>
-                    <h3>量化优化</h3>
-                    <p>支持 4-bit、8-bit 等多种量化方案，在保持模型精度的同时大幅降低内存占用</p>
+                    <h3>多语言支持</h3>
+                    <p>支持 Python、JavaScript、C/C++、Java、Go、Rust 等主流编程语言，满足不同技术栈开发者的补全需求。</p>
                 </div>
 
                 <div class="feature-card">
@@ -195,8 +237,8 @@
                             <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
                         </svg>
                     </div>
-                    <h3>跨平台</h3>
-                    <p>支持 Linux、macOS、Windows 等主流操作系统，可在多种硬件平台上运行</p>
+                    <h3>Fill-in-the-Middle</h3>
+                    <p>支持 FIM（填空补全）模式，可根据光标前后的代码上下文在中间位置精准插入代码，适配主流 IDE 集成场景。</p>
                 </div>
 
                 <div class="feature-card">
@@ -206,43 +248,91 @@
                         </svg>
                     </div>
                     <h3>开源免费</h3>
-                    <p>基于 MIT 协议开源，可自由使用、修改和分发，欢迎社区贡献</p>
+                    <p>基于 Apache 2.0 协议完全开源，可免费用于个人与商业项目，欢迎开发者在此基础上进行二次开发与定制。</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- GitHub Link Section -->
-    <section class="github-section">
+    <!-- Quick Start Section -->
+    <section class="model-quickstart">
         <div class="container">
-            <div class="github-content">
-                <div class="github-info">
-                    <div class="github-icon">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
-                        </svg>
-                    </div>
-                    <h2>在 GitHub 上参与贡献</h2>
-                    <p>swllm.cpp 是一个开源项目，我们欢迎开发者参与贡献代码、报告问题和分享想法</p>
-                    <a href="https://github.com/shenwenAI/swllm.cpp" class="btn btn-primary" target="_blank">
-                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
-                        </svg>
-                        访问 GitHub 仓库
-                    </a>
+            <div class="section-header">
+                <h2 class="section-title">快速开始</h2>
+                <p class="section-description">
+                    三步即可在本地运行 shenwen-coder-0.5b
+                </p>
+            </div>
+
+            <div class="quickstart-steps">
+                <div class="quickstart-step">
+                    <div class="step-number">1</div>
+                    <h3>安装依赖</h3>
+                    <p>通过 pip 安装 transformers 库，确保您的 Python 环境已就绪。</p>
+                    <div class="code-block">pip install transformers torch</div>
                 </div>
-                <div class="github-stats">
-                    <div class="stat-item">
-                        <span class="stat-number">C/C++</span>
-                        <span class="stat-label">开发语言</span>
+
+                <div class="quickstart-step">
+                    <div class="step-number">2</div>
+                    <h3>加载模型</h3>
+                    <p>从 HuggingFace 下载并加载 shenwen-coder-0.5b 模型与分词器。</p>
+                    <div class="code-block">from transformers import AutoModelForCausalLM, AutoTokenizer
+
+model_id = "shenwenAI/shenwen-coder-0.5b"
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+model = AutoModelForCausalLM.from_pretrained(model_id)</div>
+                </div>
+
+                <div class="quickstart-step">
+                    <div class="step-number">3</div>
+                    <h3>运行补全</h3>
+                    <p>输入代码前缀，调用模型生成接口，获取智能补全结果。</p>
+                    <div class="code-block">prefix = "def fibonacci(n):\n    "
+inputs = tokenizer(prefix, return_tensors="pt")
+outputs = model.generate(**inputs, max_new_tokens=64)
+print(tokenizer.decode(outputs[0]))</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HuggingFace Section -->
+    <section class="model-hf-section">
+        <div class="container">
+            <div class="model-hf-content">
+                <div class="model-hf-info">
+                    <div class="model-hf-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12.025 1.13c-5.77 0-10.449 4.647-10.449 10.378 0 1.112.178 2.181.503 3.185.064-.222.203-.444.416-.577a.96.96 0 0 1 .524-.15c.293 0 .584.124.84.284.278.173.48.408.71.694.226.282.458.611.684.951v-.014c.017-.324.106-.622.264-.874s.403-.487.762-.543c.3-.047.596.06.787.203s.31.313.4.467c.15.257.212.468.233.542.01.026.653 1.552 1.657 2.54.616.605 1.01 1.223 1.082 1.912.055.537-.096 1.059-.38 1.572.637.121 1.294.187 1.967.187.657 0 1.298-.063 1.921-.178-.287-.517-.44-1.041-.384-1.581.07-.69.465-1.307 1.081-1.913 1.004-.987 1.647-2.513 1.657-2.539.021-.074.083-.285.233-.542.09-.154.208-.323.4-.467a1.08 1.08 0 0 1 .787-.203c.359.056.604.29.762.543s.247.55.265.874v.015c.225-.34.457-.67.683-.952.23-.286.432-.52.71-.694.257-.16.547-.284.84-.285a.97.97 0 0 1 .524.151c.228.143.373.388.43.625l.006.04a10.3 10.3 0 0 0 .534-3.273c0-5.731-4.678-10.378-10.449-10.378M8.327 6.583a1.5 1.5 0 0 1 .713.174 1.487 1.487 0 0 1 .617 2.013c-.183.343-.762-.214-1.102-.094-.38.134-.532.914-.917.71a1.487 1.487 0 0 1 .69-2.803m7.486 0a1.487 1.487 0 0 1 .689 2.803c-.385.204-.536-.576-.916-.71-.34-.12-.92.437-1.103.094a1.487 1.487 0 0 1 .617-2.013 1.5 1.5 0 0 1 .713-.174m-10.68 1.55a.96.96 0 1 1 0 1.921.96.96 0 0 1 0-1.92m13.838 0a.96.96 0 1 1 0 1.92.96.96 0 0 1 0-1.92M8.489 11.458c.588.01 1.965 1.157 3.572 1.164 1.607-.007 2.984-1.155 3.572-1.164.196-.003.305.12.305.454 0 .886-.424 2.328-1.563 3.202-.22-.756-1.396-1.366-1.63-1.32q-.011.001-.02.006l-.044.026-.01.008-.03.024q-.018.017-.035.036l-.032.04a1 1 0 0 0-.058.09l-.014.025q-.049.088-.11.19a1 1 0 0 1-.083.116 1.2 1.2 0 0 1-.173.18q-.035.029-.075.058a1.3 1.3 0 0 1-.251-.243 1 1 0 0 1-.076-.107c-.124-.193-.177-.363-.337-.444-.034-.016-.104-.008-.2.022q-.094.03-.216.087-.06.028-.125.063l-.13.074q-.067.04-.136.086a3 3 0 0 0-.135.096 3 3 0 0 0-.26.219 2 2 0 0 0-.12.121 2 2 0 0 0-.106.128l-.002.002a2 2 0 0 0-.09.132l-.001.001a1.2 1.2 0 0 0-.105.212q-.013.036-.024.073c-1.139-.875-1.563-2.317-1.563-3.203 0-.334.109-.457.305-.454m.836 10.354c.824-1.19.766-2.082-.365-3.194-1.13-1.112-1.789-2.738-1.789-2.738s-.246-.945-.806-.858-.97 1.499.202 2.362c1.173.864-.233 1.45-.685.64-.45-.812-1.683-2.896-2.322-3.295s-1.089-.175-.938.647 2.822 2.813 2.562 3.244-1.176-.506-1.176-.506-2.866-2.567-3.49-1.898.473 1.23 2.037 2.16c1.564.932 1.686 1.178 1.464 1.53s-3.675-2.511-4-1.297c-.323 1.214 3.524 1.567 3.287 2.405-.238.839-2.71-1.587-3.216-.642-.506.946 3.49 2.056 3.522 2.064 1.29.33 4.568 1.028 5.713-.624m5.349 0c-.824-1.19-.766-2.082.365-3.194 1.13-1.112 1.789-2.738 1.789-2.738s.246-.945.806-.858.97 1.499-.202 2.362c-1.173.864.233 1.45.685.64.451-.812 1.683-2.896 2.322-3.295s1.089-.175.938.647-2.822 2.813-2.562 3.244 1.176-.506 1.176-.506 2.866-2.567 3.49-1.898-.473 1.23-2.037 2.16c-1.564.932-1.686 1.178-1.464 1.53s3.675-2.511 4-1.297c.323 1.214-3.524 1.567-3.287 2.405.238.839 2.71-1.587 3.216-.642.506.946-3.49 2.056-3.522 2.064-1.29.33-4.568 1.028-5.713-.624"/>
+                        </svg>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-number">MIT</span>
-                        <span class="stat-label">开源协议</span>
+                    <h2>在 HuggingFace 上获取</h2>
+                    <p>shenwen-coder-0.5b 已发布至 HuggingFace Model Hub，支持通过 transformers 库直接加载，也可下载 GGUF 格式配合 swllm.cpp 在本地高效运行。</p>
+                    <div class="model-hf-actions">
+                        <a href="https://huggingface.co/shenwenAI/shenwen-coder-0.5b" class="btn btn-primary" target="_blank">
+                            前往 HuggingFace
+                        </a>
+                        <a href="index.html" class="btn btn-outline">
+                            了解 swllm.cpp
+                        </a>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-number">跨平台</span>
-                        <span class="stat-label">系统支持</span>
+                </div>
+                <div class="model-hf-stats">
+                    <div class="model-hf-stat">
+                        <div class="model-hf-stat-value">0.5B</div>
+                        <div class="model-hf-stat-label">模型参数</div>
+                    </div>
+                    <div class="model-hf-stat">
+                        <div class="model-hf-stat-value">6+</div>
+                        <div class="model-hf-stat-label">支持语言</div>
+                    </div>
+                    <div class="model-hf-stat">
+                        <div class="model-hf-stat-value">FIM</div>
+                        <div class="model-hf-stat-label">补全模式</div>
+                    </div>
+                    <div class="model-hf-stat">
+                        <div class="model-hf-stat-value">本地</div>
+                        <div class="model-hf-stat-label">运行方式</div>
                     </div>
                 </div>
             </div>
@@ -253,10 +343,10 @@
     <section class="cta-section">
         <div class="container">
             <div class="cta-content">
-                <h2>准备好体验 swllm.cpp 了吗？</h2>
-                <p>立即开始在本地运行大语言模型</p>
+                <h2>准备好体验智能代码补全了吗？</h2>
+                <p>立即前往 HuggingFace 下载 shenwen-coder-0.5b</p>
                 <div class="cta-actions">
-                    <a href="https://github.com/shenwenAI/swllm.cpp" class="btn btn-white" target="_blank">前往 GitHub</a>
+                    <a href="https://huggingface.co/shenwenAI/shenwen-coder-0.5b" class="btn btn-white" target="_blank">前往 HuggingFace</a>
                     <a href="payus.html" class="btn btn-outline-white">赞助我们</a>
                 </div>
             </div>
@@ -299,7 +389,6 @@
                         <li><a href="model.html">shenwen-coder-0.5b</a></li>
                         <li><a href="#">API</a></li>
                         <li><a href="#">文档</a></li>
-                        <li><a href="#">定价</a></li>
                         <li><a href="#">更新日志</a></li>
                     </ul>
                 </div>
