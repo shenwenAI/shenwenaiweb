@@ -2306,3 +2306,249 @@ html.dark .moon-icon {
         padding: 120px 0 60px;
     }
 }
+
+/* Model Page Styles */
+.model-hero {
+    padding: 140px 0 80px;
+    background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+    text-align: center;
+}
+
+.model-hero .hero-content {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.model-overview {
+    padding: 80px 0;
+    background: var(--bg-secondary);
+}
+
+.model-overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: start;
+}
+
+.model-overview-info h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.model-overview-info > p {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 32px;
+}
+
+.model-meta-table {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.model-meta-row {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.model-meta-row:last-child {
+    border-bottom: none;
+}
+
+.model-meta-label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    width: 120px;
+    flex-shrink: 0;
+}
+
+.model-meta-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.model-tags-list {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.model-tag-item {
+    padding: 4px 10px;
+    background: var(--brand-light);
+    color: var(--brand-primary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.model-overview-code h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.model-quickstart {
+    padding: 80px 0;
+    background: var(--bg-primary);
+}
+
+.quickstart-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 48px;
+}
+
+.quickstart-step {
+    padding: 32px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    transition: all var(--transition-base);
+}
+
+.quickstart-step:hover {
+    border-color: var(--brand-primary);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    background: var(--brand-primary);
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.quickstart-step h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.quickstart-step p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+.quickstart-step .code-block {
+    padding: 12px 16px;
+    font-size: 0.8rem;
+}
+
+.model-hf-section {
+    padding: 80px 0;
+    background: var(--bg-secondary);
+}
+
+.model-hf-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+.model-hf-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.model-hf-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--brand-light);
+    color: var(--brand-primary);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.model-hf-icon svg {
+    width: 36px;
+    height: 36px;
+}
+
+.model-hf-info h2 {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.model-hf-info p {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+.model-hf-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.model-hf-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.model-hf-stat {
+    padding: 24px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.model-hf-stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--brand-primary);
+    margin-bottom: 6px;
+}
+
+.model-hf-stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 1024px) {
+    .model-overview-grid,
+    .model-hf-content {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .quickstart-steps {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .model-hero {
+        padding: 120px 0 60px;
+    }
+
+    .model-hf-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
