@@ -73,8 +73,17 @@ async function initDatabase() {
 // ==================== Express 应用 ====================
 var app = express();
 
-// JSON 解析
-app.use(express.json());
+// JSON 解析（限制请求体大小，防止超大请求攻击）
+app.use(express.json({ limit: '1mb' }));
+
+// 安全响应头
+app.use(function(req, res, next) {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    next();
+});
 
 // CORS 跨域配置
 app.use(cors({
@@ -104,12 +113,70 @@ function getExpiresAt() {
     return new Date(Date.now() + TOKEN_EXPIRE_MS).toISOString();
 }
 
+// ==================== 速率限制（防暴力破解） ====================
+var rateLimitMap = {};
+
+/**
+ * 简单的内存速率限制器
+ * @param {number} maxAttempts - 时间窗口内最大请求数
+ * @param {number} windowMs - 时间窗口（毫秒）
+ */
+function rateLimit(maxAttempts, windowMs) {
+    return function(req, res, next) {
+        var ip = req.ip || req.connection.remoteAddress || 'unknown';
+        var key = req.path + ':' + ip;
+        var now = Date.now();
+
+        if (!rateLimitMap[key]) {
+            rateLimitMap[key] = { count: 1, resetTime: now + windowMs };
+            return next();
+        }
+
+        var entry = rateLimitMap[key];
+        if (now > entry.resetTime) {
+            // 时间窗口已过，重置
+            entry.count = 1;
+            entry.resetTime = now + windowMs;
+            return next();
+        }
+
+        entry.count++;
+        if (entry.count > maxAttempts) {
+            var retryAfter = Math.ceil((entry.resetTime - now) / 1000);
+            res.setHeader('Retry-After', retryAfter);
+            return res.status(429).json({
+                success: false,
+                message: '请求太频繁，请 ' + retryAfter + ' 秒后重试',
+                message_en: 'Too many requests, please try again in ' + retryAfter + ' seconds'
+            });
+        }
+
+        next();
+    };
+}
+
+// 定期清理过期的速率限制记录（每10分钟）
+setInterval(function() {
+    var now = Date.now();
+    var keys = Object.keys(rateLimitMap);
+    for (var i = 0; i < keys.length; i++) {
+        if (now > rateLimitMap[keys[i]].resetTime) {
+            delete rateLimitMap[keys[i]];
+        }
+    }
+}, 10 * 60 * 1000);
+
+// 登录: 每个 IP 每15分钟最多10次尝试
+var loginLimiter = rateLimit(10, 15 * 60 * 1000);
+// 注册: 每个 IP 每小时最多5次
+var registerLimiter = rateLimit(5, 60 * 60 * 1000);
+
 // ==================== API 路由 ====================
 
 /**
  * POST /api/auth/register - 用户注册
  */
-app.post('/api/auth/register', async function(req, res) {
+app.post('/api/auth/register', registerLimiter, async function(req, res) {
     try {
         var name = req.body.name;
         var email = req.body.email;
@@ -168,7 +235,7 @@ app.post('/api/auth/register', async function(req, res) {
 /**
  * POST /api/auth/login - 用户登录
  */
-app.post('/api/auth/login', async function(req, res) {
+app.post('/api/auth/login', loginLimiter, async function(req, res) {
     try {
         var email = req.body.email;
         var password = req.body.password;
