@@ -18,6 +18,7 @@
         initGetApiHandler();
         initAuthForms();
         initDashboard();
+        initContactForm();
     });
 
     // ==================== 主题切换功能 ====================
@@ -972,6 +973,54 @@ console.log(data.choices[0].message);`
                 });
             });
         }
+    }
+
+    // ==================== 联系表单功能 ====================
+    function initContactForm() {
+        var contactForm = document.getElementById('contactForm');
+        if (!contactForm) return;
+
+        var isEnglish = document.documentElement.lang === 'en';
+
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var name = document.getElementById('contactName').value.trim();
+            var email = document.getElementById('contactEmail').value.trim();
+            var subject = document.getElementById('contactSubject').value.trim();
+            var message = document.getElementById('contactMessage').value.trim();
+            var submitBtn = document.getElementById('contactSubmitBtn');
+
+            if (!name || !email || !message) {
+                showAuthMessage('contactFormMessage', isEnglish ? 'Please fill in name, email and message' : '请填写姓名、邮箱和消息', 'error');
+                return;
+            }
+
+            var originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = isEnglish ? 'Sending...' : '发送中...';
+
+            fetch(AUTH_API_URL + '/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name, email: email, subject: subject, message: message })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showAuthMessage('contactFormMessage', isEnglish ? (data.message_en || 'Message sent successfully!') : (data.message || '消息已发送！'), 'success');
+                    contactForm.reset();
+                } else {
+                    showAuthMessage('contactFormMessage', isEnglish ? (data.message_en || 'Failed to send message') : (data.message || '发送失败'), 'error');
+                }
+            })
+            .catch(function() {
+                showAuthMessage('contactFormMessage', isEnglish ? 'Network error, please try again' : '网络错误，请稍后重试', 'error');
+            })
+            .finally(function() {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            });
+        });
     }
 
 })();

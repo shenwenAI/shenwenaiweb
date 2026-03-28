@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API 服务 - shenwenAI</title>
+    <title>联系我们 - shenwenAI</title>
     <link rel="icon" type="image/png" href="shenwenAI.png">
     <link rel="apple-touch-icon" sizes="180x180" href="shenwenAI.png">
     <link rel="stylesheet" href="styles.css">
@@ -24,11 +24,11 @@
                 <a href="model.html">模型</a>
                 <a href="payus.html">赞助我们</a>
                 <a href="blog.html">博客</a>
-                <a href="api.html" class="active">API服务</a>
+                <a href="api.html">API服务</a>
             </nav>
 
             <div class="header-actions">
-                <a href="api-en.html" class="lang-switch" title="Switch to English">EN</a>
+                <a href="contact-en.html" class="lang-switch" title="Switch to English">EN</a>
                 <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
                     <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="5"/>
@@ -62,110 +62,41 @@
         <div class="container">
             <div class="hero-content">
                 <h1 class="hero-title">
-                    API 服务
+                    联系我们
                 </h1>
                 <p class="hero-description">
-                    使用 shenwenAI API 访问我们最新的 shenwen-coderV2 模型<br>基于 swllm.cpp 推理引擎，提供高性能云端推理服务
+                    有问题或建议？请通过以下表单发送消息给我们
                 </p>
             </div>
         </div>
     </section>
 
-    <!-- Pricing Section -->
-    <section class="pricing">
+    <!-- Contact Form Section -->
+    <section class="auth-section">
         <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">选择适合您的方案</h2>
-                <p class="section-description">
-                    灵活的定价方案，满足不同规模的开发需求
-                </p>
-            </div>
-
-            <div class="pricing-grid">
-                <div class="pricing-card">
-                    <h3>免费版</h3>
-                    <div class="price">
-                        <span class="amount">免费</span>
-                        <span class="period">/每天</span>
-                    </div>
-                    <ul class="pricing-features">
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            每天 2,000 次免费请求
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            支持 shenwen-coderV2 模型
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            标准响应速度
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            社区支持
-                        </li>
-                    </ul>
-                    <a href="#" class="btn btn-outline" onclick="handleGetApi(); return false;">获取 API</a>
-                </div>
-
-                <div class="pricing-card featured">
-                    <h3>专业版</h3>
-                    <div class="price">
-                        <span class="amount">¥10</span>
-                        <span class="period">/月</span>
-                    </div>
-                    <ul class="pricing-features">
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            无限量 API 请求
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            支持所有模型
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            优先响应速度
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            专属技术支持
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            更高并发限制
-                        </li>
-                    </ul>
-                    <a href="#" class="btn btn-primary" onclick="handleGetApi(); return false;">获取 API</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Model Info Section -->
-    <section class="features">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">支持的模型</h2>
-                <p class="section-description">
-                    swllm.cpp 可以推理我们最新的模型
-                </p>
-            </div>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.57-3.25 3.92L12 10v2m0 0l-3 3m3-3l3 3"/>
-                            <circle cx="12" cy="18" r="4"/>
-                            <path d="M12 14v0"/>
-                            <path d="M4.93 4.93l1.41 1.41m11.32-1.41l-1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32 1.41l-1.41-1.41"/>
-                        </svg>
-                    </div>
-                    <h3>shenwen-coderV2-GGUF</h3>
-                    <p>基于 swllm.cpp 推理引擎的高性能代码生成模型，支持 GGUF 格式，适用于本地和云端部署</p>
-                    <a href="https://huggingface.co/shenwenAI/shenwen-coderV2-GGUF" class="btn btn-primary" target="_blank">在 HuggingFace 上查看</a>
+            <div class="auth-container">
+                <div class="auth-card" id="contactFormCard">
+                    <h2>发送消息</h2>
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="contactName">姓名</label>
+                            <input type="text" id="contactName" placeholder="请输入您的姓名" required maxlength="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="contactEmail">邮箱</label>
+                            <input type="email" id="contactEmail" placeholder="请输入您的邮箱" required autocomplete="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="contactSubject">主题 <span style="color:var(--text-muted);font-weight:400;">（选填）</span></label>
+                            <input type="text" id="contactSubject" placeholder="请输入主题" maxlength="200">
+                        </div>
+                        <div class="form-group">
+                            <label for="contactMessage">消息</label>
+                            <textarea id="contactMessage" placeholder="请输入您的消息内容" required maxlength="5000" rows="5"></textarea>
+                        </div>
+                        <div id="contactFormMessage" class="auth-message" style="display:none;"></div>
+                        <button type="submit" class="btn btn-primary auth-btn" id="contactSubmitBtn">发送消息</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -175,10 +106,10 @@
     <section class="cta-section">
         <div class="container">
             <div class="cta-content">
-                <h2>准备好使用 shenwenAI API 了吗？</h2>
-                <p>立即获取 API 密钥，开始使用我们的 AI 服务</p>
+                <h2>准备好使用 shenwenAI 了吗？</h2>
+                <p>探索我们的 AI 模型和 API 服务</p>
                 <div class="cta-actions">
-                    <a href="#" class="btn btn-white" onclick="handleGetApi(); return false;">获取 API</a>
+                    <a href="api.html" class="btn btn-white">前往 API 服务</a>
                     <a href="payus.html" class="btn btn-outline-white">赞助我们</a>
                 </div>
             </div>
