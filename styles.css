@@ -2614,6 +2614,31 @@ html.dark .moon-icon {
     color: var(--text-muted);
 }
 
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    transition: all var(--transition-base);
+    box-sizing: border-box;
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-group textarea::placeholder {
+    color: var(--text-muted);
+}
+
 .auth-btn {
     width: 100%;
     justify-content: center;
