@@ -574,23 +574,24 @@ console.log(data.choices[0].message);`
         if (loginForm) {
             loginForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+                var isEnglish = document.documentElement.lang === 'en';
                 var email = document.getElementById('loginEmail').value.trim();
                 var password = document.getElementById('loginPassword').value;
 
                 if (!email || !password) {
-                    showAuthMessage('loginMessage', '请填写所有字段', 'error');
+                    showAuthMessage('loginMessage', isEnglish ? 'Please fill in all fields' : '请填写所有字段', 'error');
                     return;
                 }
 
                 var users = JSON.parse(localStorage.getItem('shenwenai_users') || '{}');
                 if (users[email] && users[email].password === password) {
                     localStorage.setItem('shenwenai_user', JSON.stringify({ email: email, name: users[email].name }));
-                    showAuthMessage('loginMessage', '登录成功！正在跳转...', 'success');
+                    showAuthMessage('loginMessage', isEnglish ? 'Login successful! Redirecting...' : '登录成功！正在跳转...', 'success');
                     setTimeout(function() {
                         window.location.href = 'https://shenwenapi.578388.xyz';
                     }, 1500);
                 } else {
-                    showAuthMessage('loginMessage', '邮箱或密码错误', 'error');
+                    showAuthMessage('loginMessage', isEnglish ? 'Invalid email or password' : '邮箱或密码错误', 'error');
                 }
             });
         }
@@ -598,29 +599,30 @@ console.log(data.choices[0].message);`
         if (registerForm) {
             registerForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+                var isEnglish = document.documentElement.lang === 'en';
                 var name = document.getElementById('registerName').value.trim();
                 var email = document.getElementById('registerEmail').value.trim();
                 var password = document.getElementById('registerPassword').value;
                 var confirmPassword = document.getElementById('registerConfirmPassword').value;
 
                 if (!name || !email || !password || !confirmPassword) {
-                    showAuthMessage('registerMessage', '请填写所有字段', 'error');
+                    showAuthMessage('registerMessage', isEnglish ? 'Please fill in all fields' : '请填写所有字段', 'error');
                     return;
                 }
 
                 if (password !== confirmPassword) {
-                    showAuthMessage('registerMessage', '两次密码输入不一致', 'error');
+                    showAuthMessage('registerMessage', isEnglish ? 'Passwords do not match' : '两次密码输入不一致', 'error');
                     return;
                 }
 
                 if (password.length < 6) {
-                    showAuthMessage('registerMessage', '密码长度至少6位', 'error');
+                    showAuthMessage('registerMessage', isEnglish ? 'Password must be at least 6 characters' : '密码长度至少6位', 'error');
                     return;
                 }
 
                 var users = JSON.parse(localStorage.getItem('shenwenai_users') || '{}');
                 if (users[email]) {
-                    showAuthMessage('registerMessage', '该邮箱已注册', 'error');
+                    showAuthMessage('registerMessage', isEnglish ? 'This email is already registered' : '该邮箱已注册', 'error');
                     return;
                 }
 
@@ -628,7 +630,6 @@ console.log(data.choices[0].message);`
                 localStorage.setItem('shenwenai_users', JSON.stringify(users));
                 localStorage.setItem('shenwenai_user', JSON.stringify({ email: email, name: name }));
 
-                var isEnglish = document.documentElement.lang === 'en';
                 var successMsg = isEnglish
                     ? 'Registration successful! We are still building our cloud models. Please sponsor our computing power and we will publish your account name on our website.'
                     : '注册成功！我们还在搭建云端模型，请赞助我们算力，我们会在网站中发布你的帐号名。';
