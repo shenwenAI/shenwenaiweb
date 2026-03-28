@@ -41,6 +41,7 @@
                 <a href="model-en.html">Models</a>
                 <a href="payus-en.html">Sponsor Us</a>
                 <a href="blog-en.html">Blog</a>
+                <a href="api-en.html">API Service</a>
             </nav>
 
             <div class="header-actions">
@@ -87,7 +88,8 @@
                 </h1>
                 <p class="hero-description">
                     swllm.cpp is a high-performance C/C++ LLM inference engine by shenwenAI,<br>
-                    optimized for local deployment and edge computing, supporting multiple model formats and hardware acceleration.
+                    optimized for local deployment and edge computing, supporting multiple model formats and hardware acceleration.<br>
+                    Now supports inference of our latest <a href="https://huggingface.co/shenwenAI/shenwen-coderV2-GGUF" target="_blank" style="color: var(--brand-primary);">shenwen-coderV2-GGUF</a> model.
                 </p>
                 <div class="hero-actions">
                     <a href="https://github.com/shenwenAI/swllm.cpp" class="btn btn-primary" target="_blank">
@@ -96,11 +98,13 @@
                         </svg>
                         View on GitHub
                     </a>
-                    <a href="payus-en.html" class="btn btn-secondary">
+                    <a href="#" class="btn btn-secondary" onclick="handleGetApi(); return false;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                            <line x1="12" y1="22.08" x2="12" y2="12"/>
                         </svg>
-                        Sponsor Us
+                        Get API
                     </a>
                 </div>
             </div>
@@ -298,7 +302,7 @@
                         <li><a href="index-en.html">swllm.cpp</a></li>
                         <li><a href="model-en.html">shenwen-coder-0.5b</a></li>
                         <li><a href="model-coderv2-en.html">shenwen-coderV2-Instruct</a></li>
-                        <li><a href="#">API</a></li>
+                        <li><a href="api-en.html">API</a></li>
                         <li><a href="#">Docs</a></li>
                         <li><a href="#">Pricing</a></li>
                         <li><a href="#">Changelog</a></li>
