@@ -535,9 +535,125 @@ console.log(data.choices[0].message);`
         initSponsorModal();
     });
 
-})();
+    // ==================== 获取API处理 ====================
+    function initGetApiHandler() {
+        window.handleGetApi = function() {
+            var user = localStorage.getItem('shenwenai_user');
+            if (user) {
+                window.location.href = 'https://shenwenapi.578388.xyz';
+            } else {
+                var isEnglish = document.documentElement.lang === 'en';
+                window.location.href = isEnglish ? 'login-en.html' : 'login.html';
+            }
+        };
+    }
 
-// Global handler for API buttons
-function handleGetApi() {
-    alert('API 服务即将上线，敬请期待！');
-}
+    // ==================== 登录注册功能 ====================
+    function initAuthForms() {
+        var loginForm = document.getElementById('loginForm');
+        var registerForm = document.getElementById('registerForm');
+        var showRegisterLink = document.getElementById('showRegister');
+        var showLoginLink = document.getElementById('showLogin');
+        var loginSection = document.getElementById('loginSection');
+        var registerSection = document.getElementById('registerSection');
+
+        if (showRegisterLink && showLoginLink && loginSection && registerSection) {
+            showRegisterLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                loginSection.style.display = 'none';
+                registerSection.style.display = 'block';
+            });
+
+            showLoginLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                registerSection.style.display = 'none';
+                loginSection.style.display = 'block';
+            });
+        }
+
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var email = document.getElementById('loginEmail').value.trim();
+                var password = document.getElementById('loginPassword').value;
+
+                if (!email || !password) {
+                    showAuthMessage('loginMessage', '请填写所有字段', 'error');
+                    return;
+                }
+
+                var users = JSON.parse(localStorage.getItem('shenwenai_users') || '{}');
+                if (users[email] && users[email].password === password) {
+                    localStorage.setItem('shenwenai_user', JSON.stringify({ email: email, name: users[email].name }));
+                    showAuthMessage('loginMessage', '登录成功！正在跳转...', 'success');
+                    setTimeout(function() {
+                        window.location.href = 'https://shenwenapi.578388.xyz';
+                    }, 1500);
+                } else {
+                    showAuthMessage('loginMessage', '邮箱或密码错误', 'error');
+                }
+            });
+        }
+
+        if (registerForm) {
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var name = document.getElementById('registerName').value.trim();
+                var email = document.getElementById('registerEmail').value.trim();
+                var password = document.getElementById('registerPassword').value;
+                var confirmPassword = document.getElementById('registerConfirmPassword').value;
+
+                if (!name || !email || !password || !confirmPassword) {
+                    showAuthMessage('registerMessage', '请填写所有字段', 'error');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    showAuthMessage('registerMessage', '两次密码输入不一致', 'error');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    showAuthMessage('registerMessage', '密码长度至少6位', 'error');
+                    return;
+                }
+
+                var users = JSON.parse(localStorage.getItem('shenwenai_users') || '{}');
+                if (users[email]) {
+                    showAuthMessage('registerMessage', '该邮箱已注册', 'error');
+                    return;
+                }
+
+                users[email] = { name: name, password: password };
+                localStorage.setItem('shenwenai_users', JSON.stringify(users));
+                localStorage.setItem('shenwenai_user', JSON.stringify({ email: email, name: name }));
+
+                var isEnglish = document.documentElement.lang === 'en';
+                var successMsg = isEnglish
+                    ? 'Registration successful! We are still building our cloud models. Please sponsor our computing power and we will publish your account name on our website.'
+                    : '注册成功！我们还在搭建云端模型，请赞助我们算力，我们会在网站中发布你的帐号名。';
+                showAuthMessage('registerMessage', successMsg, 'success');
+
+                setTimeout(function() {
+                    window.location.href = 'https://shenwenapi.578388.xyz';
+                }, 3000);
+            });
+        }
+    }
+
+    function showAuthMessage(elementId, message, type) {
+        var el = document.getElementById(elementId);
+        if (el) {
+            el.textContent = message;
+            el.className = 'auth-message ' + type;
+            el.style.display = 'block';
+        }
+    }
+
+    // 在DOMContentLoaded中追加初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        initGetApiHandler();
+        initAuthForms();
+    });
+
+})();
