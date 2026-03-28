@@ -134,6 +134,16 @@ function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+/**
+ * 验证密码强度：至少8位，包含字母和特殊符号（非空白非字母数字字符）
+ */
+function isValidPassword(password) {
+    if (!password || password.length < 8) return false;
+    if (!/[a-zA-Z]/.test(password)) return false;
+    if (!/[^a-zA-Z0-9\s]/.test(password)) return false;
+    return true;
+}
+
 function getExpiresAt() {
     return new Date(Date.now() + TOKEN_EXPIRE_MS).toISOString();
 }
@@ -191,6 +201,8 @@ setInterval(function() {
     }
 }, 10 * 60 * 1000);
 
+// 修改密码验证码: 每个 IP 每10分钟最多5次
+var changePasswordCodeLimiter = rateLimit(5, 10 * 60 * 1000);
 // 登录: 每个 IP 每15分钟最多10次尝试
 var loginLimiter = rateLimit(10, 15 * 60 * 1000);
 // 注册: 每个 IP 每小时最多5次
@@ -201,9 +213,13 @@ var sendCodeLimiter = rateLimit(5, 10 * 60 * 1000);
 // ==================== 邮箱验证码存储 ====================
 // 结构: { [email]: { code, name, password, expiresAt } }
 var pendingVerifications = {};
+// 修改密码验证码存储: { [email]: { code, expiresAt, sentAt } }
+var pendingPasswordChanges = {};
 
 // 验证码有效期（毫秒），10分钟
 var CODE_EXPIRE_MS = 10 * 60 * 1000;
+// 重新发送验证码冷却时间（毫秒），60秒
+var RESEND_COOLDOWN_MS = 60 * 1000;
 
 // 定期清理过期验证码（每5分钟）
 setInterval(function() {
@@ -212,6 +228,12 @@ setInterval(function() {
     for (var i = 0; i < keys.length; i++) {
         if (now > pendingVerifications[keys[i]].expiresAt) {
             delete pendingVerifications[keys[i]];
+        }
+    }
+    var pwKeys = Object.keys(pendingPasswordChanges);
+    for (var j = 0; j < pwKeys.length; j++) {
+        if (now > pendingPasswordChanges[pwKeys[j]].expiresAt) {
+            delete pendingPasswordChanges[pwKeys[j]];
         }
     }
 }, 5 * 60 * 1000);
@@ -250,6 +272,33 @@ async function sendVerificationEmail(email, name, code) {
     });
 }
 
+/**
+ * 发送修改密码验证码邮件
+ */
+async function sendChangePasswordEmail(email, name, code) {
+    if (!mailerTransport) {
+        throw new Error('邮件服务未配置');
+    }
+    var subject = 'shenwenAI 修改密码验证码 / Password Change Verification Code';
+    var html = [
+        '<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;border:1px solid #e5e7eb;border-radius:8px;">',
+        '  <h2 style="color:#2563eb;margin-bottom:8px;">shenwenAI</h2>',
+        '  <p style="color:#374151;">您好 ' + name + '，/ Hello ' + name + ',</p>',
+        '  <p style="color:#374151;">您正在修改账户密码，验证码是：<br>You are changing your account password. The verification code is:</p>',
+        '  <div style="font-size:36px;font-weight:bold;letter-spacing:8px;color:#2563eb;text-align:center;padding:16px 0;">' + code + '</div>',
+        '  <p style="color:#6b7280;font-size:13px;">验证码有效期10分钟。<br>The code is valid for 10 minutes.</p>',
+        '  <p style="color:#6b7280;font-size:13px;">如果您没有请求修改密码，请忽略此邮件并确保账户安全。<br>If you did not request a password change, please ignore this email and secure your account.</p>',
+        '</div>'
+    ].join('\n');
+
+    await mailerTransport.sendMail({
+        from: EMAIL_FROM,
+        to: email,
+        subject: subject,
+        html: html
+    });
+}
+
 // ==================== API 路由 ====================
 
 /**
@@ -267,8 +316,8 @@ app.post('/api/auth/send-code', sendCodeLimiter, async function(req, res) {
         if (!isValidEmail(email)) {
             return res.status(400).json({ success: false, message: '邮箱格式不正确', message_en: 'Invalid email format' });
         }
-        if (password.length < 6) {
-            return res.status(400).json({ success: false, message: '密码长度至少6位', message_en: 'Password must be at least 6 characters' });
+        if (!isValidPassword(password)) {
+            return res.status(400).json({ success: false, message: '密码须至少8位，包含字母和特殊符号', message_en: 'Password must be at least 8 characters and contain letters and special characters' });
         }
         if (name.length > 50) {
             return res.status(400).json({ success: false, message: '用户名不能超过50个字符', message_en: 'Username cannot exceed 50 characters' });
@@ -291,10 +340,10 @@ app.post('/api/auth/send-code', sendCodeLimiter, async function(req, res) {
         // 对密码哈希后存入待验证队列（避免明文密码在内存停留过久）
         var salt = await bcrypt.genSalt(10);
         var hashedPassword = await bcrypt.hash(password, salt);
-        // 若该邮箱已有未过期验证码且发送时间不足60秒，拒绝重复发送
+        // 若该邮箱已有未过期验证码且发送时间不足冷却期，拒绝重复发送
         var existing = pendingVerifications[email];
-        if (existing && Date.now() <= existing.expiresAt && existing.sentAt && Date.now() - existing.sentAt < 60 * 1000) {
-            var waitSec = Math.ceil((60 * 1000 - (Date.now() - existing.sentAt)) / 1000);
+        if (existing && Date.now() <= existing.expiresAt && existing.sentAt && Date.now() - existing.sentAt < RESEND_COOLDOWN_MS) {
+            var waitSec = Math.ceil((RESEND_COOLDOWN_MS - (Date.now() - existing.sentAt)) / 1000);
             return res.status(429).json({ success: false, message: '请等待 ' + waitSec + ' 秒后再重新发送', message_en: 'Please wait ' + waitSec + ' seconds before resending' });
         }
         pendingVerifications[email] = {
@@ -335,8 +384,8 @@ app.post('/api/auth/register', registerLimiter, async function(req, res) {
         if (!isValidEmail(email)) {
             return res.status(400).json({ success: false, message: '邮箱格式不正确', message_en: 'Invalid email format' });
         }
-        if (password.length < 6) {
-            return res.status(400).json({ success: false, message: '密码长度至少6位', message_en: 'Password must be at least 6 characters' });
+        if (!isValidPassword(password)) {
+            return res.status(400).json({ success: false, message: '密码须至少8位，包含字母和特殊符号', message_en: 'Password must be at least 8 characters and contain letters and special characters' });
         }
         if (name.length > 50) {
             return res.status(400).json({ success: false, message: '用户名不能超过50个字符', message_en: 'Username cannot exceed 50 characters' });
@@ -487,6 +536,125 @@ app.post('/api/auth/logout', function(req, res) {
     } catch (err) {
         console.error('退出错误:', err);
         res.status(500).json({ success: false, message: '服务器错误', message_en: 'Server error' });
+    }
+});
+
+/**
+ * POST /api/auth/send-change-password-code - 发送修改密码验证码（需要登录）
+ */
+app.post('/api/auth/send-change-password-code', changePasswordCodeLimiter, async function(req, res) {
+    try {
+        var authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ success: false, message: '未登录', message_en: 'Not logged in' });
+        }
+        var token = authHeader.slice(7);
+        var stmt = db.prepare(
+            'SELECT users.id, users.name, users.email FROM tokens JOIN users ON tokens.user_id = users.id WHERE tokens.token = ? AND tokens.expires_at > datetime(?)'
+        );
+        stmt.bind([token, new Date().toISOString()]);
+        if (!stmt.step()) {
+            stmt.free();
+            return res.status(401).json({ success: false, message: '登录已过期，请重新登录', message_en: 'Session expired, please log in again' });
+        }
+        var user = stmt.getAsObject();
+        stmt.free();
+
+        if (!mailerTransport) {
+            return res.status(503).json({ success: false, message: '邮件服务暂不可用，请联系管理员', message_en: 'Email service is unavailable, please contact the administrator' });
+        }
+
+        // 防止冷却期内重复发送
+        var existing = pendingPasswordChanges[user.email];
+        if (existing && Date.now() <= existing.expiresAt && existing.sentAt && Date.now() - existing.sentAt < RESEND_COOLDOWN_MS) {
+            var waitSec = Math.ceil((RESEND_COOLDOWN_MS - (Date.now() - existing.sentAt)) / 1000);
+            return res.status(429).json({ success: false, message: '请等待 ' + waitSec + ' 秒后再重新发送', message_en: 'Please wait ' + waitSec + ' seconds before resending' });
+        }
+
+        var code = generateVerificationCode();
+        pendingPasswordChanges[user.email] = {
+            code: code,
+            userId: user.id,
+            sentAt: Date.now(),
+            expiresAt: Date.now() + CODE_EXPIRE_MS
+        };
+
+        await sendChangePasswordEmail(user.email, user.name, code);
+        console.log('已发送修改密码验证码至:', user.email);
+
+        res.json({
+            success: true,
+            message: '验证码已发送至您的邮箱，请在10分钟内完成修改',
+            message_en: 'Verification code sent to your email. Please complete the password change within 10 minutes.'
+        });
+    } catch (err) {
+        console.error('发送修改密码验证码错误:', err);
+        res.status(500).json({ success: false, message: '发送验证码失败，请稍后重试', message_en: 'Failed to send verification code, please try again later' });
+    }
+});
+
+/**
+ * POST /api/auth/change-password - 修改密码（需要登录和验证码）
+ */
+app.post('/api/auth/change-password', async function(req, res) {
+    try {
+        var authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ success: false, message: '未登录', message_en: 'Not logged in' });
+        }
+        var token = authHeader.slice(7);
+        var stmt = db.prepare(
+            'SELECT users.id, users.name, users.email FROM tokens JOIN users ON tokens.user_id = users.id WHERE tokens.token = ? AND tokens.expires_at > datetime(?)'
+        );
+        stmt.bind([token, new Date().toISOString()]);
+        if (!stmt.step()) {
+            stmt.free();
+            return res.status(401).json({ success: false, message: '登录已过期，请重新登录', message_en: 'Session expired, please log in again' });
+        }
+        var user = stmt.getAsObject();
+        stmt.free();
+
+        var newPassword = req.body.newPassword;
+        var code = (req.body.code || '').trim();
+
+        if (!newPassword || !code) {
+            return res.status(400).json({ success: false, message: '请填写所有字段', message_en: 'Please fill in all fields' });
+        }
+        if (!isValidPassword(newPassword)) {
+            return res.status(400).json({ success: false, message: '密码须至少8位，包含字母和特殊符号', message_en: 'Password must be at least 8 characters and contain letters and special characters' });
+        }
+
+        // 验证验证码
+        var pending = pendingPasswordChanges[user.email];
+        if (!pending) {
+            return res.status(400).json({ success: false, message: '请先获取验证码', message_en: 'Please request a verification code first' });
+        }
+        if (Date.now() > pending.expiresAt) {
+            delete pendingPasswordChanges[user.email];
+            return res.status(400).json({ success: false, message: '验证码已过期，请重新获取', message_en: 'Verification code expired, please request a new one' });
+        }
+        if (pending.code !== code) {
+            return res.status(400).json({ success: false, message: '验证码错误', message_en: 'Incorrect verification code' });
+        }
+
+        var salt = await bcrypt.genSalt(10);
+        var hashedPassword = await bcrypt.hash(newPassword, salt);
+        db.run('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, user.id]);
+
+        // 清除验证码记录
+        delete pendingPasswordChanges[user.email];
+
+        saveDatabase();
+        console.log('用户修改密码:', user.email);
+
+        res.json({
+            success: true,
+            message: '密码已成功修改',
+            message_en: 'Password changed successfully'
+        });
+    } catch (err) {
+        console.error('修改密码错误:', err);
+        res.status(500).json({ success: false, message: '服务器错误，请稍后重试', message_en: 'Server error, please try again later' });
     }
 });
 
