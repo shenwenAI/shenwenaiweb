@@ -73,6 +73,9 @@ async function initDatabase() {
 // ==================== Express 应用 ====================
 var app = express();
 
+// 信任 Cloudflare 和 Nginx 反向代理，确保 req.ip 获取真实客户端 IP
+app.set('trust proxy', true);
+
 // JSON 解析（限制请求体大小，防止超大请求攻击）
 app.use(express.json({ limit: '1mb' }));
 

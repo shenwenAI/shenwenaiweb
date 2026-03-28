@@ -127,7 +127,7 @@ pm2 status
 pm2 logs shenwenai-auth
 ```
 
-### 第八步：配置 Nginx 反向代理
+### 第八步：配置 Nginx 反向代理（Cloudflare CDN HTTPS）
 
 ```bash
 nano /etc/nginx/sites-available/shenwenai-auth
@@ -135,9 +135,48 @@ nano /etc/nginx/sites-available/shenwenai-auth
 
 写入以下内容：
 ```nginx
+# ==================== Cloudflare 真实 IP 还原 ====================
+# Cloudflare IPv4 地址段
+set_real_ip_from 173.245.48.0/20;
+set_real_ip_from 103.21.244.0/22;
+set_real_ip_from 103.22.200.0/22;
+set_real_ip_from 103.31.4.0/22;
+set_real_ip_from 141.101.64.0/18;
+set_real_ip_from 108.162.192.0/18;
+set_real_ip_from 190.93.240.0/20;
+set_real_ip_from 188.114.96.0/20;
+set_real_ip_from 197.234.240.0/22;
+set_real_ip_from 198.41.128.0/17;
+set_real_ip_from 162.158.0.0/15;
+set_real_ip_from 104.16.0.0/13;
+set_real_ip_from 104.24.0.0/14;
+set_real_ip_from 172.64.0.0/13;
+set_real_ip_from 131.0.72.0/22;
+# Cloudflare IPv6 地址段
+set_real_ip_from 2400:cb00::/32;
+set_real_ip_from 2606:4700::/32;
+set_real_ip_from 2803:f800::/32;
+set_real_ip_from 2405:b500::/32;
+set_real_ip_from 2405:8100::/32;
+set_real_ip_from 2a06:98c0::/29;
+set_real_ip_from 2c0f:f248::/32;
+real_ip_header CF-Connecting-IP;
+
 server {
     listen 80;
     server_name shenwenapi.578388.xyz;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name shenwenapi.578388.xyz;
+
+    # Cloudflare Origin 证书
+    ssl_certificate /etc/ssl/cloudflare/shenwenapi.578388.xyz.pem;
+    ssl_certificate_key /etc/ssl/cloudflare/shenwenapi.578388.xyz.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
 
     location /api/ {
         proxy_pass http://127.0.0.1:3000;
@@ -148,7 +187,13 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header CF-Connecting-IP $http_cf_connecting_ip;
         proxy_cache_bypass $http_upgrade;
+    }
+
+    location / {
+        add_header Content-Type application/json;
+        return 200 '{"service":"shenwenAI Auth API","status":"ok"}';
     }
 }
 ```
@@ -160,18 +205,34 @@ nginx -t          # 测试配置
 systemctl reload nginx
 ```
 
-### 第九步：配置 HTTPS（推荐）
+### 第九步：配置 Cloudflare CDN HTTPS
 
-```bash
-# 安装 certbot
-apt-get install -y certbot python3-certbot-nginx
+1. **Cloudflare DNS 设置**：
+   - 登录 [Cloudflare 仪表板](https://dash.cloudflare.com)
+   - 为 `shenwenapi.578388.xyz` 添加 A 记录，指向你的服务器 IP
+   - 确保代理状态为 **已代理**（橙色云朵图标）
 
-# 获取 SSL 证书
-certbot --nginx -d shenwenapi.578388.xyz
+2. **Cloudflare SSL/TLS 设置**：
+   - 进入 SSL/TLS 页面，加密模式选择 **Full (strict)**
 
-# 自动续期
-certbot renew --dry-run
-```
+3. **生成 Cloudflare Origin 证书**：
+   ```bash
+   # 在 Cloudflare 仪表板 -> SSL/TLS -> Origin Server -> Create Certificate
+   # 生成证书后，将内容保存到服务器：
+
+   mkdir -p /etc/ssl/cloudflare
+
+   # 将证书内容粘贴保存
+   nano /etc/ssl/cloudflare/shenwenapi.578388.xyz.pem    # 证书
+   nano /etc/ssl/cloudflare/shenwenapi.578388.xyz.key    # 私钥
+
+   # 设置文件权限
+   chmod 600 /etc/ssl/cloudflare/shenwenapi.578388.xyz.key
+   chmod 644 /etc/ssl/cloudflare/shenwenapi.578388.xyz.pem
+
+   # 重启 Nginx
+   nginx -t && systemctl reload nginx
+   ```
 
 ### 第十步：测试 API
 
@@ -217,3 +278,6 @@ cp /opt/shenwenaiweb/server/data/users.db /opt/shenwenaiweb/server/data/users.db
 2. **CORS 错误**：确认 `.env` 中的 `CORS_ORIGINS` 包含你的前端域名
 3. **数据库错误**：检查 `data/` 目录的写入权限（`chmod 755 data/`）
 4. **PM2 问题**：`pm2 logs` 查看详细错误日志
+5. **Cloudflare 521 错误**：确认 Nginx 和后端服务正在运行（`pm2 status` 和 `systemctl status nginx`）
+6. **Cloudflare 525 SSL 错误**：检查 Origin 证书是否正确配置在 `/etc/ssl/cloudflare/` 目录
+7. **速率限制不准确**：确认 Nginx 配置了 Cloudflare `set_real_ip_from` 和 `real_ip_header CF-Connecting-IP`
