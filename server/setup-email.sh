@@ -56,7 +56,10 @@ install_if_missing() {
     if ! command -v "$cmd" &> /dev/null; then
         info "  正在安装 $pkg..."
         apt-get update -qq 2>/dev/null
-        apt-get install -y "$pkg" -qq 2>/dev/null
+        if ! apt-get install -y "$pkg" 2>&1 | tail -3; then
+            error "  $pkg 安装失败，请手动安装: apt-get install $pkg"
+            exit 1
+        fi
         success "  $pkg 安装完成"
     else
         success "  $cmd 已安装"
@@ -198,7 +201,10 @@ if [ "$SETUP_DKIM" = "y" ] || [ "$SETUP_DKIM" = "Y" ]; then
 
     if [ "$REGEN_DKIM" = "y" ] || [ "$REGEN_DKIM" = "Y" ]; then
         info "正在生成 2048 位 RSA DKIM 密钥对..."
-        openssl genrsa -out "$DKIM_KEY_PATH" 2048 2>/dev/null
+        if ! openssl genrsa -out "$DKIM_KEY_PATH" 2048 2>&1 | grep -v "^[.+]*$"; then
+            error "DKIM 密钥生成失败，请检查 openssl 是否正确安装"
+            exit 1
+        fi
         chmod 600 "$DKIM_KEY_PATH"
         success "DKIM 私钥已生成: $DKIM_KEY_PATH"
     fi
@@ -259,7 +265,11 @@ fi
 
 # 确保 TOKEN_SECRET 已设置
 if ! grep -q "^TOKEN_SECRET=" "$ENV_FILE" 2>/dev/null || grep -q "^TOKEN_SECRET=please-change" "$ENV_FILE" 2>/dev/null; then
-    TOKEN_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+    TOKEN_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))" 2>/dev/null)
+    if [ -z "$TOKEN_SECRET" ] || [ "$TOKEN_SECRET" = "please-change-this-to-a-random-string" ]; then
+        error "TOKEN_SECRET 生成失败，请确保 Node.js 已正确安装"
+        exit 1
+    fi
     update_env "TOKEN_SECRET" "$TOKEN_SECRET"
     info "TOKEN_SECRET 已自动生成"
 fi

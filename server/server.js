@@ -767,7 +767,9 @@ app.post('/api/contact', contactLimiter, async function(req, res) {
 app.post('/api/email/verify-config', async function(req, res) {
     try {
         var secret = (req.body.secret || '').trim();
-        if (!secret || secret !== TOKEN_SECRET) {
+        var secretBuf = Buffer.from(secret);
+        var expectedBuf = Buffer.from(TOKEN_SECRET);
+        if (!secret || secretBuf.length !== expectedBuf.length || !crypto.timingSafeEqual(secretBuf, expectedBuf)) {
             return res.status(403).json({ success: false, message: '权限不足', message_en: 'Access denied' });
         }
 
