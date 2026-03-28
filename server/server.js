@@ -27,15 +27,37 @@ var EMAIL_PASS = process.env.EMAIL_PASS || '';
 var EMAIL_FROM = process.env.EMAIL_FROM || EMAIL_USER;
 var ADMIN_EMAIL = process.env.ADMIN_EMAIL || EMAIL_USER;
 
+// DKIM 签名配置（用于自定义域名邮箱认证）
+var DKIM_DOMAIN = process.env.DKIM_DOMAIN || '';
+var DKIM_SELECTOR = process.env.DKIM_SELECTOR || 'default';
+var DKIM_PRIVATE_KEY_PATH = process.env.DKIM_PRIVATE_KEY_PATH || '';
+
 var mailerTransport = null;
 if (EMAIL_HOST && EMAIL_USER && EMAIL_PASS) {
-    mailerTransport = nodemailer.createTransport({
+    var transportOptions = {
         host: EMAIL_HOST,
         port: EMAIL_PORT,
         secure: EMAIL_SECURE,
         auth: { user: EMAIL_USER, pass: EMAIL_PASS }
-    });
-    console.log('邮件服务已配置: ' + EMAIL_HOST);
+    };
+
+    // 如果配置了 DKIM，加载私钥并添加 DKIM 签名
+    if (DKIM_DOMAIN && DKIM_PRIVATE_KEY_PATH) {
+        try {
+            var dkimKey = fs.readFileSync(DKIM_PRIVATE_KEY_PATH, 'utf8');
+            transportOptions.dkim = {
+                domainName: DKIM_DOMAIN,
+                keySelector: DKIM_SELECTOR,
+                privateKey: dkimKey
+            };
+            console.log('DKIM 签名已配置: ' + DKIM_SELECTOR + '._domainkey.' + DKIM_DOMAIN);
+        } catch (dkimErr) {
+            console.warn('警告: DKIM 私钥加载失败（' + DKIM_PRIVATE_KEY_PATH + '）: ' + dkimErr.message);
+        }
+    }
+
+    mailerTransport = nodemailer.createTransport(transportOptions);
+    console.log('邮件服务已配置: ' + EMAIL_HOST + ' (发件人: ' + EMAIL_FROM + ')');
 } else {
     console.warn('警告: 邮件配置未设置，注册验证码功能不可用（请设置 EMAIL_HOST/EMAIL_USER/EMAIL_PASS 环境变量）');
 }
@@ -735,6 +757,84 @@ app.post('/api/contact', contactLimiter, async function(req, res) {
     } catch (err) {
         console.error('联系表单邮件发送错误:', err);
         res.status(500).json({ success: false, message: '发送失败，请稍后重试', message_en: 'Failed to send message, please try again later' });
+    }
+});
+
+/**
+ * POST /api/email/verify-config - 验证邮件配置（仅管理员使用，需 ADMIN_SECRET）
+ * 发送一封测试邮件到管理员邮箱，确认 SMTP + DKIM 设置正确
+ */
+app.post('/api/email/verify-config', async function(req, res) {
+    try {
+        var secret = (req.body.secret || '').trim();
+        if (!secret || secret !== TOKEN_SECRET) {
+            return res.status(403).json({ success: false, message: '权限不足', message_en: 'Access denied' });
+        }
+
+        if (!mailerTransport) {
+            return res.status(503).json({
+                success: false,
+                message: '邮件服务未配置',
+                message_en: 'Email service is not configured',
+                config: {
+                    EMAIL_HOST: EMAIL_HOST ? '已设置' : '未设置',
+                    EMAIL_USER: EMAIL_USER ? '已设置' : '未设置',
+                    EMAIL_PASS: EMAIL_PASS ? '已设置' : '未设置',
+                    EMAIL_FROM: EMAIL_FROM || '未设置',
+                    DKIM_DOMAIN: DKIM_DOMAIN || '未设置',
+                    DKIM_SELECTOR: DKIM_SELECTOR || '未设置',
+                    DKIM_PRIVATE_KEY_PATH: DKIM_PRIVATE_KEY_PATH || '未设置'
+                }
+            });
+        }
+
+        // 验证 SMTP 连接
+        await mailerTransport.verify();
+
+        // 发送测试邮件
+        var testTo = (req.body.to || ADMIN_EMAIL || '').trim();
+        if (!testTo) {
+            return res.status(400).json({ success: false, message: '请指定收件人或设置 ADMIN_EMAIL', message_en: 'Please specify a recipient or set ADMIN_EMAIL' });
+        }
+
+        var hasDkim = !!(DKIM_DOMAIN && DKIM_PRIVATE_KEY_PATH);
+        var info = await mailerTransport.sendMail({
+            from: EMAIL_FROM,
+            to: testTo,
+            subject: 'shenwenAI 邮件配置测试 / Email Configuration Test',
+            html: [
+                '<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;border:1px solid #e5e7eb;border-radius:8px;">',
+                '  <h2 style="color:#2563eb;margin-bottom:8px;">shenwenAI</h2>',
+                '  <p style="color:#374151;">邮件配置测试成功！<br>Email configuration test passed!</p>',
+                '  <table style="width:100%;border-collapse:collapse;margin:16px 0;">',
+                '    <tr><td style="padding:4px 8px;color:#6b7280;">SMTP:</td><td style="padding:4px 8px;color:#111827;">' + EMAIL_HOST + ':' + EMAIL_PORT + '</td></tr>',
+                '    <tr><td style="padding:4px 8px;color:#6b7280;">发件人:</td><td style="padding:4px 8px;color:#111827;">' + escapeHtml(EMAIL_FROM) + '</td></tr>',
+                '    <tr><td style="padding:4px 8px;color:#6b7280;">DKIM:</td><td style="padding:4px 8px;color:#111827;">' + (hasDkim ? '✅ 已启用 (' + DKIM_SELECTOR + '._domainkey.' + DKIM_DOMAIN + ')' : '❌ 未配置') + '</td></tr>',
+                '  </table>',
+                '  <p style="color:#6b7280;font-size:13px;">发送时间: ' + new Date().toISOString() + '</p>',
+                '</div>'
+            ].join('\n')
+        });
+
+        res.json({
+            success: true,
+            message: '测试邮件发送成功',
+            message_en: 'Test email sent successfully',
+            details: {
+                messageId: info.messageId,
+                from: EMAIL_FROM,
+                to: testTo,
+                smtp: EMAIL_HOST + ':' + EMAIL_PORT,
+                dkim: hasDkim ? DKIM_SELECTOR + '._domainkey.' + DKIM_DOMAIN : 'not configured'
+            }
+        });
+    } catch (err) {
+        console.error('邮件配置验证失败:', err);
+        res.status(500).json({
+            success: false,
+            message: '邮件配置验证失败: ' + err.message,
+            message_en: 'Email configuration verification failed: ' + err.message
+        });
     }
 });
 
