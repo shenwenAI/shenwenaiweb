@@ -241,6 +241,8 @@ var loginLimiter = rateLimit(10, 15 * 60 * 1000);
 var registerLimiter = rateLimit(5, 60 * 60 * 1000);
 // 发送验证码: 每个 IP 每10分钟最多5次
 var sendCodeLimiter = rateLimit(5, 10 * 60 * 1000);
+// 邮件配置验证: 每个 IP 每小时最多3次
+var emailVerifyLimiter = rateLimit(3, 60 * 60 * 1000);
 
 // ==================== 邮箱验证码存储 ====================
 // 结构: { [email]: { code, name, password, expiresAt } }
@@ -764,7 +766,7 @@ app.post('/api/contact', contactLimiter, async function(req, res) {
  * POST /api/email/verify-config - 验证邮件配置（仅管理员使用，需 TOKEN_SECRET）
  * 发送一封测试邮件到管理员邮箱，确认 SMTP + DKIM 设置正确
  */
-app.post('/api/email/verify-config', async function(req, res) {
+app.post('/api/email/verify-config', emailVerifyLimiter, async function(req, res) {
     try {
         var secret = (req.body.secret || '').trim();
         var secretBuf = Buffer.from(secret);
