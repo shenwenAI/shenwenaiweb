@@ -17,6 +17,7 @@
         initFaqAccordion();
         initGetApiHandler();
         initAuthForms();
+        initDashboard();
     });
 
     // ==================== 主题切换功能 ====================
@@ -547,7 +548,8 @@ console.log(data.choices[0].message);`
         window.handleGetApi = function() {
             var token = localStorage.getItem('shenwenai_token');
             if (token) {
-                window.location.href = 'https://shenwenapi.578388.xyz';
+                var isEnglish = document.documentElement.lang === 'en';
+                window.location.href = isEnglish ? 'dashboard-en.html' : 'dashboard.html';
             } else {
                 var isEnglish = document.documentElement.lang === 'en';
                 window.location.href = isEnglish ? 'login-en.html' : 'login.html';
@@ -563,6 +565,9 @@ console.log(data.choices[0].message);`
         var showLoginLink = document.getElementById('showLogin');
         var loginSection = document.getElementById('loginSection');
         var registerSection = document.getElementById('registerSection');
+        var forgotPwSection = document.getElementById('forgotPwSection');
+        var showForgotPwLink = document.getElementById('showForgotPw');
+        var backToLoginLink = document.getElementById('backToLogin');
         var sendCodeCountdownTimer = null;
 
         if (showRegisterLink && showLoginLink && loginSection && registerSection) {
@@ -570,6 +575,7 @@ console.log(data.choices[0].message);`
                 e.preventDefault();
                 loginSection.style.display = 'none';
                 registerSection.style.display = 'block';
+                if (forgotPwSection) forgotPwSection.style.display = 'none';
             });
 
             showLoginLink.addEventListener('click', function(e) {
@@ -579,6 +585,23 @@ console.log(data.choices[0].message);`
                     sendCodeCountdownTimer = null;
                 }
                 registerSection.style.display = 'none';
+                loginSection.style.display = 'block';
+                if (forgotPwSection) forgotPwSection.style.display = 'none';
+            });
+        }
+
+        if (showForgotPwLink && forgotPwSection) {
+            showForgotPwLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (loginSection) loginSection.style.display = 'none';
+                if (registerSection) registerSection.style.display = 'none';
+                forgotPwSection.style.display = 'block';
+            });
+        }
+        if (backToLoginLink && loginSection) {
+            backToLoginLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (forgotPwSection) forgotPwSection.style.display = 'none';
                 loginSection.style.display = 'block';
             });
         }
@@ -614,7 +637,7 @@ console.log(data.choices[0].message);`
                         localStorage.setItem('shenwenai_user', JSON.stringify(data.user));
                         showAuthMessage('loginMessage', isEnglish ? (data.message_en || 'Login successful! Redirecting...') : (data.message || '登录成功！正在跳转...'), 'success');
                         setTimeout(function() {
-                            window.location.href = 'https://shenwenapi.578388.xyz';
+                            window.location.href = isEnglish ? 'dashboard-en.html' : 'dashboard.html';
                         }, 1500);
                     } else {
                         showAuthMessage('loginMessage', isEnglish ? (data.message_en || 'Invalid email or password') : (data.message || '邮箱或密码错误'), 'error');
@@ -653,8 +676,8 @@ console.log(data.choices[0].message);`
                         showAuthMessage('registerMessage', isEnglish ? 'Passwords do not match' : '两次密码输入不一致', 'error');
                         return;
                     }
-                    if (password.length < 6) {
-                        showAuthMessage('registerMessage', isEnglish ? 'Password must be at least 6 characters' : '密码长度至少6位', 'error');
+                    if (password.length < 8 || !/[a-zA-Z]/.test(password) || !/[^a-zA-Z0-9\s]/.test(password)) {
+                        showAuthMessage('registerMessage', isEnglish ? 'Password must be at least 8 characters and contain letters and special characters' : '密码须至少8位，包含字母和特殊符号', 'error');
                         return;
                     }
 
@@ -725,8 +748,8 @@ console.log(data.choices[0].message);`
                     showAuthMessage('registerMessage', isEnglish ? 'Passwords do not match' : '两次密码输入不一致', 'error');
                     return;
                 }
-                if (password.length < 6) {
-                    showAuthMessage('registerMessage', isEnglish ? 'Password must be at least 6 characters' : '密码长度至少6位', 'error');
+                if (password.length < 8 || !/[a-zA-Z]/.test(password) || !/[^a-zA-Z0-9\s]/.test(password)) {
+                    showAuthMessage('registerMessage', isEnglish ? 'Password must be at least 8 characters and contain letters and special characters' : '密码须至少8位，包含字母和特殊符号', 'error');
                     return;
                 }
                 if (!code) {
@@ -756,7 +779,7 @@ console.log(data.choices[0].message);`
                             : (data.message || '注册成功！');
                         showAuthMessage('registerMessage', successMsg, 'success');
                         setTimeout(function() {
-                            window.location.href = 'https://shenwenapi.578388.xyz';
+                            window.location.href = isEnglish ? 'dashboard-en.html' : 'dashboard.html';
                         }, 3000);
                     } else {
                         showAuthMessage('registerMessage', isEnglish ? (data.message_en || 'Registration failed') : (data.message || '注册失败'), 'error');
@@ -780,6 +803,174 @@ console.log(data.choices[0].message);`
             el.textContent = message;
             el.className = 'auth-message ' + type;
             el.style.display = 'block';
+        }
+    }
+
+    // ==================== 控制台/仪表板功能 ====================
+    function initDashboard() {
+        var dashboardSection = document.getElementById('dashboardSection');
+        if (!dashboardSection) return;
+
+        var isEnglish = document.documentElement.lang === 'en';
+        var token = localStorage.getItem('shenwenai_token');
+
+        if (!token) {
+            window.location.href = isEnglish ? 'login-en.html' : 'login.html';
+            return;
+        }
+
+        // 从后端获取用户信息
+        fetch(AUTH_API_URL + '/api/auth/user', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (!data.success) {
+                localStorage.removeItem('shenwenai_token');
+                localStorage.removeItem('shenwenai_user');
+                window.location.href = isEnglish ? 'login-en.html' : 'login.html';
+                return;
+            }
+            var user = data.user;
+            localStorage.setItem('shenwenai_user', JSON.stringify(user));
+            var nameEl = document.getElementById('dashUserName');
+            var emailEl = document.getElementById('dashUserEmail');
+            var initialEl = document.getElementById('dashUserInitial');
+            if (nameEl) nameEl.textContent = user.name;
+            if (emailEl) emailEl.textContent = user.email;
+            if (initialEl) initialEl.textContent = user.name.charAt(0).toUpperCase();
+        })
+        .catch(function() {
+            // 网络错误时使用本地缓存
+            var cached = localStorage.getItem('shenwenai_user');
+            if (cached) {
+                try {
+                    var user = JSON.parse(cached);
+                    var nameEl = document.getElementById('dashUserName');
+                    var emailEl = document.getElementById('dashUserEmail');
+                    var initialEl = document.getElementById('dashUserInitial');
+                    if (nameEl) nameEl.textContent = user.name;
+                    if (emailEl) emailEl.textContent = user.email;
+                    if (initialEl) initialEl.textContent = user.name.charAt(0).toUpperCase();
+                } catch (e) { /* ignore */ }
+            }
+        });
+
+        // 退出登录
+        var logoutBtn = document.getElementById('dashLogoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function() {
+                fetch(AUTH_API_URL + '/api/auth/logout', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                }).catch(function() { /* ignore */ }).finally(function() {
+                    localStorage.removeItem('shenwenai_token');
+                    localStorage.removeItem('shenwenai_user');
+                    window.location.href = isEnglish ? 'login-en.html' : 'login.html';
+                });
+            });
+        }
+
+        // 修改密码
+        var sendChangePwCodeBtn = document.getElementById('sendChangePwCodeBtn');
+        var changePwSubmitBtn = document.getElementById('changePwSubmitBtn');
+        var changePwCodeGroup = document.getElementById('changePwCodeGroup');
+        var changePwCountdownTimer = null;
+
+        if (sendChangePwCodeBtn) {
+            sendChangePwCodeBtn.addEventListener('click', function() {
+                var originalText = sendChangePwCodeBtn.textContent;
+                sendChangePwCodeBtn.disabled = true;
+                sendChangePwCodeBtn.textContent = isEnglish ? 'Sending...' : '发送中...';
+
+                fetch(AUTH_API_URL + '/api/auth/send-change-password-code', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        showAuthMessage('changePwMessage', isEnglish ? (data.message_en || 'Verification code sent!') : (data.message || '验证码已发送！'), 'success');
+                        if (changePwCodeGroup) changePwCodeGroup.style.display = 'block';
+                        if (changePwSubmitBtn) changePwSubmitBtn.style.display = 'block';
+                        sendChangePwCodeBtn.style.display = 'none';
+                        var countdown = 60;
+                        if (changePwCountdownTimer) clearInterval(changePwCountdownTimer);
+                        changePwCountdownTimer = setInterval(function() {
+                            countdown--;
+                            if (countdown <= 0) {
+                                clearInterval(changePwCountdownTimer);
+                                changePwCountdownTimer = null;
+                                sendChangePwCodeBtn.disabled = false;
+                                sendChangePwCodeBtn.textContent = isEnglish ? 'Resend Code' : '重新发送验证码';
+                                sendChangePwCodeBtn.style.display = 'block';
+                            } else {
+                                sendChangePwCodeBtn.textContent = isEnglish ? 'Resend (' + countdown + 's)' : '重新发送 (' + countdown + 's)';
+                            }
+                        }, 1000);
+                    } else {
+                        sendChangePwCodeBtn.disabled = false;
+                        sendChangePwCodeBtn.textContent = originalText;
+                        showAuthMessage('changePwMessage', isEnglish ? (data.message_en || 'Failed to send code') : (data.message || '发送失败'), 'error');
+                    }
+                })
+                .catch(function() {
+                    sendChangePwCodeBtn.disabled = false;
+                    sendChangePwCodeBtn.textContent = originalText;
+                    showAuthMessage('changePwMessage', isEnglish ? 'Network error, please try again' : '网络错误，请稍后重试', 'error');
+                });
+            });
+        }
+
+        var changePwForm = document.getElementById('changePwForm');
+        if (changePwForm) {
+            changePwForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var newPassword = document.getElementById('changePwNew').value;
+                var confirmPassword = document.getElementById('changePwConfirm').value;
+                var code = document.getElementById('changePwCode') ? document.getElementById('changePwCode').value.trim() : '';
+
+                if (!newPassword || !confirmPassword || !code) {
+                    showAuthMessage('changePwMessage', isEnglish ? 'Please fill in all fields' : '请填写所有字段', 'error');
+                    return;
+                }
+                if (newPassword !== confirmPassword) {
+                    showAuthMessage('changePwMessage', isEnglish ? 'Passwords do not match' : '两次密码输入不一致', 'error');
+                    return;
+                }
+                if (newPassword.length < 8 || !/[a-zA-Z]/.test(newPassword) || !/[^a-zA-Z0-9\s]/.test(newPassword)) {
+                    showAuthMessage('changePwMessage', isEnglish ? 'Password must be at least 8 characters and contain letters and special characters' : '密码须至少8位，包含字母和特殊符号', 'error');
+                    return;
+                }
+
+                var originalText = changePwSubmitBtn ? changePwSubmitBtn.textContent : '';
+                if (changePwSubmitBtn) { changePwSubmitBtn.disabled = true; changePwSubmitBtn.textContent = isEnglish ? 'Saving...' : '保存中...'; }
+
+                fetch(AUTH_API_URL + '/api/auth/change-password', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ newPassword: newPassword, code: code })
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        showAuthMessage('changePwMessage', isEnglish ? (data.message_en || 'Password changed successfully!') : (data.message || '密码修改成功！'), 'success');
+                        changePwForm.reset();
+                        if (changePwCodeGroup) changePwCodeGroup.style.display = 'none';
+                        if (changePwSubmitBtn) changePwSubmitBtn.style.display = 'none';
+                        if (sendChangePwCodeBtn) { sendChangePwCodeBtn.style.display = 'block'; sendChangePwCodeBtn.disabled = false; sendChangePwCodeBtn.textContent = isEnglish ? 'Send Verification Code' : '发送验证码'; }
+                        if (changePwCountdownTimer) { clearInterval(changePwCountdownTimer); changePwCountdownTimer = null; }
+                    } else {
+                        showAuthMessage('changePwMessage', isEnglish ? (data.message_en || 'Failed to change password') : (data.message || '修改密码失败'), 'error');
+                    }
+                })
+                .catch(function() {
+                    showAuthMessage('changePwMessage', isEnglish ? 'Network error, please try again' : '网络错误，请稍后重试', 'error');
+                })
+                .finally(function() {
+                    if (changePwSubmitBtn) { changePwSubmitBtn.disabled = false; changePwSubmitBtn.textContent = originalText; }
+                });
+            });
         }
     }
 

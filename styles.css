@@ -2675,3 +2675,191 @@ html.dark .moon-icon {
         grid-template-columns: 1fr;
     }
 }
+
+/* ==================== Dashboard Styles ==================== */
+.dashboard-section {
+    padding: 60px 0 80px;
+    background: var(--bg-primary);
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.dashboard-card {
+    padding: 32px 28px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.dashboard-card-full {
+    grid-column: 1 / -1;
+}
+
+.dashboard-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dashboard-card-header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.dashboard-card-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--brand-primary);
+    flex-shrink: 0;
+}
+
+.dashboard-card-desc {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.dashboard-user-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.dashboard-user-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--brand-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.dashboard-user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.dashboard-user-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dashboard-user-email {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dashboard-logout-btn {
+    align-self: flex-start;
+    margin-top: auto;
+}
+
+.dashboard-api-endpoint,
+.dashboard-api-status {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dashboard-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+.dashboard-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--brand-primary);
+    background: rgba(59, 130, 246, 0.08);
+    padding: 6px 10px;
+    border-radius: 6px;
+    word-break: break-all;
+}
+
+.dashboard-status-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+.dashboard-hint {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.dashboard-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: auto;
+}
+
+.dashboard-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.dashboard-form-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-card-full {
+        grid-column: 1;
+    }
+
+    .dashboard-card {
+        padding: 24px 20px;
+    }
+
+    .dashboard-actions,
+    .dashboard-form-actions {
+        flex-direction: column;
+    }
+}
