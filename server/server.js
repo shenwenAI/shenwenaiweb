@@ -9,6 +9,7 @@ var bcrypt = require('bcryptjs');
 var crypto = require('crypto');
 var path = require('path');
 var fs = require('fs');
+var nodemailer = require('nodemailer');
 
 // ==================== 配置 ====================
 var PORT = process.env.PORT || 3000;
@@ -16,6 +17,27 @@ var TOKEN_SECRET = process.env.TOKEN_SECRET || '';
 var CORS_ORIGINS = (process.env.CORS_ORIGINS || '*').split(',').map(function(s) { return s.trim(); });
 // Token 过期时间（毫秒），默认 7 天
 var TOKEN_EXPIRE_MS = parseInt(process.env.TOKEN_EXPIRE_DAYS || '7', 10) * 24 * 60 * 60 * 1000;
+
+// 邮件配置
+var EMAIL_HOST = process.env.EMAIL_HOST || '';
+var EMAIL_PORT = parseInt(process.env.EMAIL_PORT || '465', 10);
+var EMAIL_SECURE = process.env.EMAIL_SECURE !== 'false';
+var EMAIL_USER = process.env.EMAIL_USER || '';
+var EMAIL_PASS = process.env.EMAIL_PASS || '';
+var EMAIL_FROM = process.env.EMAIL_FROM || EMAIL_USER;
+
+var mailerTransport = null;
+if (EMAIL_HOST && EMAIL_USER && EMAIL_PASS) {
+    mailerTransport = nodemailer.createTransport({
+        host: EMAIL_HOST,
+        port: EMAIL_PORT,
+        secure: EMAIL_SECURE,
+        auth: { user: EMAIL_USER, pass: EMAIL_PASS }
+    });
+    console.log('邮件服务已配置: ' + EMAIL_HOST);
+} else {
+    console.warn('警告: 邮件配置未设置，注册验证码功能不可用（请设置 EMAIL_HOST/EMAIL_USER/EMAIL_PASS 环境变量）');
+}
 
 if (!TOKEN_SECRET) {
     console.warn('警告: TOKEN_SECRET 未设置，使用随机密钥（重启后所有 token 将失效）');
@@ -173,16 +195,70 @@ setInterval(function() {
 var loginLimiter = rateLimit(10, 15 * 60 * 1000);
 // 注册: 每个 IP 每小时最多5次
 var registerLimiter = rateLimit(5, 60 * 60 * 1000);
+// 发送验证码: 每个 IP 每10分钟最多5次
+var sendCodeLimiter = rateLimit(5, 10 * 60 * 1000);
+
+// ==================== 邮箱验证码存储 ====================
+// 结构: { [email]: { code, name, password, expiresAt } }
+var pendingVerifications = {};
+
+// 验证码有效期（毫秒），10分钟
+var CODE_EXPIRE_MS = 10 * 60 * 1000;
+
+// 定期清理过期验证码（每5分钟）
+setInterval(function() {
+    var now = Date.now();
+    var keys = Object.keys(pendingVerifications);
+    for (var i = 0; i < keys.length; i++) {
+        if (now > pendingVerifications[keys[i]].expiresAt) {
+            delete pendingVerifications[keys[i]];
+        }
+    }
+}, 5 * 60 * 1000);
+
+/**
+ * 生成6位数字验证码
+ */
+function generateVerificationCode() {
+    return String(crypto.randomInt(100000, 1000000));
+}
+
+/**
+ * 发送双语验证码邮件
+ */
+async function sendVerificationEmail(email, name, code) {
+    if (!mailerTransport) {
+        throw new Error('邮件服务未配置');
+    }
+    var subject = 'shenwenAI 注册验证码 / Registration Verification Code';
+    var html = [
+        '<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;border:1px solid #e5e7eb;border-radius:8px;">',
+        '  <h2 style="color:#2563eb;margin-bottom:8px;">shenwenAI</h2>',
+        '  <p style="color:#374151;">您好 ' + name + '，/ Hello ' + name + ',</p>',
+        '  <p style="color:#374151;">您的注册验证码是：<br>Your registration verification code is:</p>',
+        '  <div style="font-size:36px;font-weight:bold;letter-spacing:8px;color:#2563eb;text-align:center;padding:16px 0;">' + code + '</div>',
+        '  <p style="color:#6b7280;font-size:13px;">验证码有效期10分钟，请尽快完成注册。<br>The code is valid for 10 minutes. Please complete registration promptly.</p>',
+        '  <p style="color:#6b7280;font-size:13px;">如果您没有在 shenwenAI 进行注册，请忽略此邮件。<br>If you did not register at shenwenAI, please ignore this email.</p>',
+        '</div>'
+    ].join('\n');
+
+    await mailerTransport.sendMail({
+        from: EMAIL_FROM,
+        to: email,
+        subject: subject,
+        html: html
+    });
+}
 
 // ==================== API 路由 ====================
 
 /**
- * POST /api/auth/register - 用户注册
+ * POST /api/auth/send-code - 发送注册验证码
  */
-app.post('/api/auth/register', registerLimiter, async function(req, res) {
+app.post('/api/auth/send-code', sendCodeLimiter, async function(req, res) {
     try {
-        var name = req.body.name;
-        var email = req.body.email;
+        var name = (req.body.name || '').trim();
+        var email = (req.body.email || '').trim();
         var password = req.body.password;
 
         if (!name || !email || !password) {
@@ -207,9 +283,90 @@ app.post('/api/auth/register', registerLimiter, async function(req, res) {
         }
         stmt.free();
 
-        // 异步密码加密
+        if (!mailerTransport) {
+            return res.status(503).json({ success: false, message: '邮件服务暂不可用，请联系管理员', message_en: 'Email service is unavailable, please contact the administrator' });
+        }
+
+        var code = generateVerificationCode();
+        // 对密码哈希后存入待验证队列（避免明文密码在内存停留过久）
         var salt = await bcrypt.genSalt(10);
         var hashedPassword = await bcrypt.hash(password, salt);
+        // 若该邮箱已有未过期验证码且发送时间不足60秒，拒绝重复发送
+        var existing = pendingVerifications[email];
+        if (existing && Date.now() <= existing.expiresAt && existing.sentAt && Date.now() - existing.sentAt < 60 * 1000) {
+            var waitSec = Math.ceil((60 * 1000 - (Date.now() - existing.sentAt)) / 1000);
+            return res.status(429).json({ success: false, message: '请等待 ' + waitSec + ' 秒后再重新发送', message_en: 'Please wait ' + waitSec + ' seconds before resending' });
+        }
+        pendingVerifications[email] = {
+            code: code,
+            name: name,
+            hashedPassword: hashedPassword,
+            sentAt: Date.now(),
+            expiresAt: Date.now() + CODE_EXPIRE_MS
+        };
+
+        await sendVerificationEmail(email, name, code);
+        console.log('已发送注册验证码至:', email);
+
+        res.json({
+            success: true,
+            message: '验证码已发送至您的邮箱，请在10分钟内完成注册',
+            message_en: 'Verification code sent to your email. Please complete registration within 10 minutes.'
+        });
+    } catch (err) {
+        console.error('发送验证码错误:', err);
+        res.status(500).json({ success: false, message: '发送验证码失败，请稍后重试', message_en: 'Failed to send verification code, please try again later' });
+    }
+});
+
+/**
+ * POST /api/auth/register - 用户注册（需要验证码）
+ */
+app.post('/api/auth/register', registerLimiter, async function(req, res) {
+    try {
+        var name = (req.body.name || '').trim();
+        var email = (req.body.email || '').trim();
+        var password = req.body.password;
+        var code = (req.body.code || '').trim();
+
+        if (!name || !email || !password || !code) {
+            return res.status(400).json({ success: false, message: '请填写所有字段', message_en: 'Please fill in all fields' });
+        }
+        if (!isValidEmail(email)) {
+            return res.status(400).json({ success: false, message: '邮箱格式不正确', message_en: 'Invalid email format' });
+        }
+        if (password.length < 6) {
+            return res.status(400).json({ success: false, message: '密码长度至少6位', message_en: 'Password must be at least 6 characters' });
+        }
+        if (name.length > 50) {
+            return res.status(400).json({ success: false, message: '用户名不能超过50个字符', message_en: 'Username cannot exceed 50 characters' });
+        }
+
+        // 验证验证码
+        var pending = pendingVerifications[email];
+        if (!pending) {
+            return res.status(400).json({ success: false, message: '请先获取验证码', message_en: 'Please request a verification code first' });
+        }
+        if (Date.now() > pending.expiresAt) {
+            delete pendingVerifications[email];
+            return res.status(400).json({ success: false, message: '验证码已过期，请重新获取', message_en: 'Verification code expired, please request a new one' });
+        }
+        if (pending.code !== code) {
+            return res.status(400).json({ success: false, message: '验证码错误', message_en: 'Incorrect verification code' });
+        }
+
+        // 检查邮箱是否已注册
+        var stmt = db.prepare('SELECT id FROM users WHERE email = ?');
+        stmt.bind([email]);
+        if (stmt.step()) {
+            stmt.free();
+            delete pendingVerifications[email];
+            return res.status(409).json({ success: false, message: '该邮箱已注册', message_en: 'This email is already registered' });
+        }
+        stmt.free();
+
+        // 使用已哈希的密码（来自发送验证码时）
+        var hashedPassword = pending.hashedPassword;
 
         db.run('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [name, email, hashedPassword]);
 
@@ -218,6 +375,9 @@ app.post('/api/auth/register', registerLimiter, async function(req, res) {
 
         var token = generateToken();
         db.run('INSERT INTO tokens (user_id, token, expires_at) VALUES (?, ?, ?)', [userId, token, getExpiresAt()]);
+
+        // 注册成功，清除验证码记录
+        delete pendingVerifications[email];
 
         saveDatabase();
         console.log('新用户注册:', email);
