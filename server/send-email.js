@@ -55,6 +55,11 @@ var EMAIL_PASS   = process.env.EMAIL_PASS   || '';
 var EMAIL_FROM   = process.env.EMAIL_FROM   || EMAIL_USER;
 var ADMIN_EMAIL  = process.env.ADMIN_EMAIL  || EMAIL_USER;
 
+// DKIM 签名配置
+var DKIM_DOMAIN           = process.env.DKIM_DOMAIN           || '';
+var DKIM_SELECTOR         = process.env.DKIM_SELECTOR         || 'default';
+var DKIM_PRIVATE_KEY_PATH = process.env.DKIM_PRIVATE_KEY_PATH || '';
+
 // ==================== 解析命令行参数 ====================
 function parseArgs(argv) {
     var args = { to: '', subject: '', message: '', html: false, help: false };
@@ -162,12 +167,29 @@ async function main() {
     }
 
     // 创建邮件传输器
-    var transport = nodemailer.createTransport({
+    var transportOptions = {
         host: EMAIL_HOST,
         port: EMAIL_PORT,
         secure: EMAIL_SECURE,
         auth: { user: EMAIL_USER, pass: EMAIL_PASS }
-    });
+    };
+
+    // 如果配置了 DKIM，加载私钥
+    if (DKIM_DOMAIN && DKIM_PRIVATE_KEY_PATH) {
+        try {
+            var dkimKey = fs.readFileSync(DKIM_PRIVATE_KEY_PATH, 'utf8');
+            transportOptions.dkim = {
+                domainName: DKIM_DOMAIN,
+                keySelector: DKIM_SELECTOR,
+                privateKey: dkimKey
+            };
+            console.log('DKIM 签名已启用: ' + DKIM_SELECTOR + '._domainkey.' + DKIM_DOMAIN);
+        } catch (dkimErr) {
+            console.warn('警告: DKIM 私钥加载失败: ' + dkimErr.message);
+        }
+    }
+
+    var transport = nodemailer.createTransport(transportOptions);
 
     // 验证连接
     try {
