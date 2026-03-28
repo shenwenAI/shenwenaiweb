@@ -127,7 +127,26 @@ pm2 status
 pm2 logs shenwenai-auth
 ```
 
-### 第八步：配置 Nginx 反向代理（Cloudflare CDN HTTPS）
+### 第八步：一键配置 Cloudflare CDN HTTPS（推荐）
+
+**前提条件**：已将 Cloudflare Origin 证书上传到服务器：
+- 证书: `/etc/ssl/cloudflare/shenwenapi.578388.xyz.pem`
+- 私钥: `/etc/ssl/cloudflare/shenwenapi.578388.xyz.key`
+
+```bash
+# 一键配置 HTTPS（自动安装 Nginx、生成配置、启用 SSL）
+sudo bash setup-cloudflare-https.sh
+```
+
+该脚本会自动完成：
+- 验证 SSL 证书文件存在并设置正确权限
+- 安装 Nginx（如未安装）
+- 生成 Nginx 配置（Cloudflare IP 还原 + HTTPS + 反向代理到端口 3000）
+- 启用配置并重载 Nginx
+- 验证服务状态
+
+<details>
+<summary>手动配置方法（如果不使用脚本）</summary>
 
 ```bash
 nano /etc/nginx/sites-available/shenwenai-auth
@@ -205,7 +224,9 @@ nginx -t          # 测试配置
 systemctl reload nginx
 ```
 
-### 第九步：配置 Cloudflare CDN HTTPS
+</details>
+
+### 第九步：配置 Cloudflare 仪表板
 
 1. **Cloudflare DNS 设置**：
    - 登录 [Cloudflare 仪表板](https://dash.cloudflare.com)
@@ -214,24 +235,13 @@ systemctl reload nginx
 
 2. **Cloudflare SSL/TLS 设置**：
    - 进入 SSL/TLS 页面，加密模式选择 **Full (strict)**
+   - 最低 TLS 版本: TLS 1.2
+   - 始终使用 HTTPS: 开启
 
-3. **生成 Cloudflare Origin 证书**：
-   ```bash
-   # 在 Cloudflare 仪表板 -> SSL/TLS -> Origin Server -> Create Certificate
-   # 生成证书后，将内容保存到服务器：
-
-   mkdir -p /etc/ssl/cloudflare
-
-   # 将证书内容粘贴保存
-   nano /etc/ssl/cloudflare/shenwenapi.578388.xyz.pem    # 证书
-   nano /etc/ssl/cloudflare/shenwenapi.578388.xyz.key    # 私钥
-
-   # 设置文件权限
-   chmod 600 /etc/ssl/cloudflare/shenwenapi.578388.xyz.key
-   chmod 644 /etc/ssl/cloudflare/shenwenapi.578388.xyz.pem
-
-   # 重启 Nginx
-   nginx -t && systemctl reload nginx
+3. **证书文件位置**（已上传到服务器）：
+   ```
+   /etc/ssl/cloudflare/shenwenapi.578388.xyz.pem  (证书)
+   /etc/ssl/cloudflare/shenwenapi.578388.xyz.key  (私钥)
    ```
 
 ### 第十步：测试 API
