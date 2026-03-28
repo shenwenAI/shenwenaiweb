@@ -13,7 +13,9 @@
 # 使用方法: sudo bash setup-cloudflare-https.sh
 # ============================================================
 
-set -e
+set -euo pipefail
+
+# 注意: 此脚本仅支持 Debian/Ubuntu 系统（使用 apt-get 安装软件包）
 
 # ==================== 变量配置 ====================
 DOMAIN="shenwenapi.578388.xyz"
@@ -200,7 +202,7 @@ fi
 
 # 测试 Nginx 配置
 echo "  测试 Nginx 配置语法..."
-if nginx -t 2>&1; then
+if nginx -t; then
     echo "  配置语法正确"
 else
     echo "  错误: Nginx 配置语法错误，请检查"
@@ -215,7 +217,17 @@ echo "  Nginx 已重载"
 echo "[5/5] 验证服务..."
 
 # 检查后端端口是否在监听
-if ss -tlnp | grep -q ":${BACKEND_PORT}"; then
+check_port() {
+    if command -v ss &> /dev/null; then
+        ss -tlnp | grep -q ":$1"
+    elif command -v netstat &> /dev/null; then
+        netstat -tlnp | grep -q ":$1"
+    else
+        return 1
+    fi
+}
+
+if check_port "${BACKEND_PORT}"; then
     echo "  后端服务正在端口 ${BACKEND_PORT} 上运行"
 else
     echo "  警告: 端口 ${BACKEND_PORT} 未检测到服务"
@@ -223,13 +235,13 @@ else
 fi
 
 # 检查 Nginx 端口
-if ss -tlnp | grep -q ":443"; then
+if check_port 443; then
     echo "  Nginx HTTPS (443) 正在监听"
 else
     echo "  警告: Nginx HTTPS 端口 443 未在监听"
 fi
 
-if ss -tlnp | grep -q ":80"; then
+if check_port 80; then
     echo "  Nginx HTTP (80) 正在监听"
 else
     echo "  警告: Nginx HTTP 端口 80 未在监听"
