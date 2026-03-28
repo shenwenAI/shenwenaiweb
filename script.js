@@ -563,6 +563,7 @@ console.log(data.choices[0].message);`
         var showLoginLink = document.getElementById('showLogin');
         var loginSection = document.getElementById('loginSection');
         var registerSection = document.getElementById('registerSection');
+        var sendCodeCountdownTimer = null;
 
         if (showRegisterLink && showLoginLink && loginSection && registerSection) {
             showRegisterLink.addEventListener('click', function(e) {
@@ -573,6 +574,10 @@ console.log(data.choices[0].message);`
 
             showLoginLink.addEventListener('click', function(e) {
                 e.preventDefault();
+                if (sendCodeCountdownTimer) {
+                    clearInterval(sendCodeCountdownTimer);
+                    sendCodeCountdownTimer = null;
+                }
                 registerSection.style.display = 'none';
                 loginSection.style.display = 'block';
             });
@@ -627,6 +632,81 @@ console.log(data.choices[0].message);`
         }
 
         if (registerForm) {
+            var sendCodeBtn = document.getElementById('sendCodeBtn');
+            var registerSubmitBtn = document.getElementById('registerSubmitBtn');
+            var verifyCodeGroup = document.getElementById('verifyCodeGroup');
+
+            // Step 1: Send verification code
+            if (sendCodeBtn) {
+                sendCodeBtn.addEventListener('click', function() {
+                    var isEnglish = document.documentElement.lang === 'en';
+                    var name = document.getElementById('registerName').value.trim();
+                    var email = document.getElementById('registerEmail').value.trim();
+                    var password = document.getElementById('registerPassword').value;
+                    var confirmPassword = document.getElementById('registerConfirmPassword').value;
+
+                    if (!name || !email || !password || !confirmPassword) {
+                        showAuthMessage('registerMessage', isEnglish ? 'Please fill in all fields' : '请填写所有字段', 'error');
+                        return;
+                    }
+                    if (password !== confirmPassword) {
+                        showAuthMessage('registerMessage', isEnglish ? 'Passwords do not match' : '两次密码输入不一致', 'error');
+                        return;
+                    }
+                    if (password.length < 6) {
+                        showAuthMessage('registerMessage', isEnglish ? 'Password must be at least 6 characters' : '密码长度至少6位', 'error');
+                        return;
+                    }
+
+                    var originalText = sendCodeBtn.textContent;
+                    sendCodeBtn.disabled = true;
+                    sendCodeBtn.textContent = isEnglish ? 'Sending...' : '发送中...';
+
+                    fetch(AUTH_API_URL + '/api/auth/send-code', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: name, email: email, password: password })
+                    })
+                    .then(function(response) { return response.json(); })
+                    .then(function(data) {
+                        if (data.success) {
+                            showAuthMessage('registerMessage', isEnglish ? (data.message_en || 'Verification code sent!') : (data.message || '验证码已发送！'), 'success');
+                            // Show code input and register button, hide send-code button
+                            if (verifyCodeGroup) verifyCodeGroup.style.display = 'block';
+                            if (registerSubmitBtn) registerSubmitBtn.style.display = 'block';
+                            sendCodeBtn.style.display = 'none';
+                            // Start resend cooldown (60s)
+                            var countdown = 60;
+                            sendCodeBtn.textContent = isEnglish ? 'Resend (' + countdown + 's)' : '重新发送 (' + countdown + 's)';
+                            if (sendCodeCountdownTimer) clearInterval(sendCodeCountdownTimer);
+                            sendCodeCountdownTimer = setInterval(function() {
+                                countdown--;
+                                if (countdown <= 0) {
+                                    clearInterval(sendCodeCountdownTimer);
+                                    sendCodeCountdownTimer = null;
+                                    sendCodeBtn.disabled = false;
+                                    sendCodeBtn.textContent = isEnglish ? 'Resend Code' : '重新发送验证码';
+                                    sendCodeBtn.style.display = 'block';
+                                } else {
+                                    sendCodeBtn.textContent = isEnglish ? 'Resend (' + countdown + 's)' : '重新发送 (' + countdown + 's)';
+                                }
+                            }, 1000);
+                        } else {
+                            sendCodeBtn.disabled = false;
+                            sendCodeBtn.textContent = originalText;
+                            showAuthMessage('registerMessage', isEnglish ? (data.message_en || 'Failed to send code') : (data.message || '发送失败'), 'error');
+                        }
+                    })
+                    .catch(function(err) {
+                        console.error('发送验证码请求失败:', err);
+                        sendCodeBtn.disabled = false;
+                        sendCodeBtn.textContent = originalText;
+                        showAuthMessage('registerMessage', isEnglish ? 'Network error, please try again' : '网络错误，请稍后重试', 'error');
+                    });
+                });
+            }
+
+            // Step 2: Submit registration with verification code
             registerForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 var isEnglish = document.documentElement.lang === 'en';
@@ -634,24 +714,28 @@ console.log(data.choices[0].message);`
                 var email = document.getElementById('registerEmail').value.trim();
                 var password = document.getElementById('registerPassword').value;
                 var confirmPassword = document.getElementById('registerConfirmPassword').value;
+                var codeInput = document.getElementById('registerVerifyCode');
+                var code = codeInput ? codeInput.value.trim() : '';
 
                 if (!name || !email || !password || !confirmPassword) {
                     showAuthMessage('registerMessage', isEnglish ? 'Please fill in all fields' : '请填写所有字段', 'error');
                     return;
                 }
-
                 if (password !== confirmPassword) {
                     showAuthMessage('registerMessage', isEnglish ? 'Passwords do not match' : '两次密码输入不一致', 'error');
                     return;
                 }
-
                 if (password.length < 6) {
                     showAuthMessage('registerMessage', isEnglish ? 'Password must be at least 6 characters' : '密码长度至少6位', 'error');
                     return;
                 }
+                if (!code) {
+                    showAuthMessage('registerMessage', isEnglish ? 'Please enter the verification code' : '请输入验证码', 'error');
+                    return;
+                }
 
                 // 显示加载状态
-                var submitBtn = registerForm.querySelector('button[type="submit"]');
+                var submitBtn = registerSubmitBtn || registerForm.querySelector('button[type="submit"]');
                 var originalText = submitBtn.textContent;
                 submitBtn.disabled = true;
                 submitBtn.textContent = isEnglish ? 'Registering...' : '注册中...';
@@ -659,7 +743,7 @@ console.log(data.choices[0].message);`
                 fetch(AUTH_API_URL + '/api/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: name, email: email, password: password })
+                    body: JSON.stringify({ name: name, email: email, password: password, code: code })
                 })
                 .then(function(response) { return response.json(); })
                 .then(function(data) {
