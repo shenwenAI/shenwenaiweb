@@ -162,8 +162,8 @@ server {
     }
 
     location / {
-        return 200 '{"service":"shenwenAI Auth API","status":"ok"}';
         add_header Content-Type application/json;
+        return 200 '{"service":"shenwenAI Auth API","status":"ok"}';
     }
 }
 NGINXEOF
