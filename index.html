@@ -41,6 +41,7 @@
                 <a href="model.html">模型</a>
                 <a href="payus.html">赞助我们</a>
                 <a href="blog.html">博客</a>
+                <a href="api.html">API服务</a>
             </nav>
 
             <div class="header-actions">
@@ -87,7 +88,8 @@
                 </h1>
                 <p class="hero-description">
                     swllm.cpp 是 shenwenAI 推出的高性能 C/C++ 大语言模型推理引擎，<br>
-                    专为本地部署和边缘计算优化，支持多种模型格式和硬件加速。
+                    专为本地部署和边缘计算优化，支持多种模型格式和硬件加速。<br>
+                    现已支持推理我们最新的 <a href="https://huggingface.co/shenwenAI/shenwen-coderV2-GGUF" target="_blank" style="color: var(--brand-primary);">shenwen-coderV2-GGUF</a> 模型。
                 </p>
                 <div class="hero-actions">
                     <a href="https://github.com/shenwenAI/swllm.cpp" class="btn btn-primary" target="_blank">
@@ -96,11 +98,13 @@
                         </svg>
                         在 GitHub 上查看
                     </a>
-                    <a href="payus.html" class="btn btn-secondary">
+                    <a href="#" class="btn btn-secondary" onclick="handleGetApi(); return false;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                            <line x1="12" y1="22.08" x2="12" y2="12"/>
                         </svg>
-                        赞助我们
+                        获取 API
                     </a>
                 </div>
             </div>
@@ -298,7 +302,7 @@
                         <li><a href="index.html">swllm.cpp</a></li>
                         <li><a href="model.html">shenwen-coder-0.5b</a></li>
                         <li><a href="model-coderv2.html">shenwen-coderV2-Instruct</a></li>
-                        <li><a href="#">API</a></li>
+                        <li><a href="api.html">API</a></li>
                         <li><a href="#">文档</a></li>
                         <li><a href="#">定价</a></li>
                         <li><a href="#">更新日志</a></li>

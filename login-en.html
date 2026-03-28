@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sponsor Us - shenwenAI</title>
+    <title>Login - shenwenAI</title>
     <link rel="icon" type="image/png" href="shenwenAI.png">
     <link rel="apple-touch-icon" sizes="180x180" href="shenwenAI.png">
     <link rel="stylesheet" href="styles.css">
@@ -22,14 +22,14 @@
             <nav class="nav-links" id="navLinks">
                 <a href="index-en.html#features">Features</a>
                 <a href="model-en.html">Models</a>
-                <a href="payus-en.html" class="active">Sponsor Us</a>
+                <a href="payus-en.html">Sponsor Us</a>
                 <a href="blog-en.html">Blog</a>
                 <a href="api-en.html">API Service</a>
             </nav>
 
             <div class="header-actions">
-                <a href="payus.html" class="lang-switch" title="切换到中文">中</a>
-                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <a href="login.html" class="lang-switch" title="切换到中文">中</a>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
                     <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="5"/>
                         <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
@@ -62,203 +62,75 @@
         <div class="container">
             <div class="hero-content">
                 <h1 class="hero-title">
-                    Sponsor Us
+                    Login / Register
                 </h1>
                 <p class="hero-description">
-                    Join shenwenAI in advancing AI technology<br>
-                    Your support will help us build more powerful open-source AI tools
+                    Log in to your shenwenAI account to access API services
                 </p>
             </div>
         </div>
     </section>
 
-    <!-- Payment Methods Section -->
-    <section class="payment-methods">
+    <!-- Auth Section -->
+    <section class="auth-section">
         <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Sponsorship Methods</h2>
-                <p class="section-description">
-                    We provide multiple sponsorship options, choose the one that suits you best
-                </p>
-            </div>
-
-            <div class="payment-grid">
-                <div class="payment-card">
-                    <div class="payment-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 4H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
-                            <line x1="1" y1="10" x2="23" y2="10"/>
-                        </svg>
-                    </div>
-                    <h3>GitHub Sponsors</h3>
-                    <p>Sponsor us directly through GitHub Sponsors for tax benefits and official recognition</p>
-                    <a href="https://github.com/sponsors/shenwenAI" class="btn btn-primary" target="_blank">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
-                        </svg>
-                        Sponsor Now
-                    </a>
+            <div class="auth-container">
+                <!-- Login Form -->
+                <div class="auth-card" id="loginSection">
+                    <h2>Login</h2>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="loginEmail">Email</label>
+                            <input type="email" id="loginEmail" placeholder="Enter your email" required autocomplete="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" placeholder="Enter your password" required autocomplete="current-password">
+                        </div>
+                        <div id="loginMessage" class="auth-message" style="display:none;"></div>
+                        <button type="submit" class="btn btn-primary auth-btn">Login</button>
+                    </form>
+                    <p class="auth-switch">Don't have an account? <a href="#" id="showRegister">Register now</a></p>
                 </div>
 
-                <div class="payment-card">
-                    <div class="payment-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                        </svg>
-                    </div>
-                    <h3>Alipay</h3>
-                    <p>Make a one-time donation via Alipay (Chinese payment method)</p>
-                    <div class="qr-code">
-                        <img src="alipay.jpeg" alt="Alipay QR Code" class="qr-image">
-                        <p class="qr-hint">Scan to sponsor</p>
-                    </div>
-                </div>
-
-                <div class="payment-card">
-                    <div class="payment-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                            <line x1="1" y1="10" x2="23" y2="10"/>
-                        </svg>
-                    </div>
-                    <h3>WeChat Pay</h3>
-                    <p>Sponsor via WeChat Pay (Chinese payment method)</p>
-                    <div class="qr-code">
-                        <img src="wechat.jpeg" alt="WeChat Pay QR Code" class="qr-image">
-                        <p class="qr-hint">Scan to sponsor</p>
-                    </div>
-                </div>
-
-                <div class="payment-card">
-                    <div class="payment-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 6v6l4 2"/>
-                        </svg>
-                    </div>
-                    <h3>Monthly Sponsor</h3>
-                    <p>Become our monthly sponsor and enjoy exclusive benefits and priority support</p>
-                    <a href="https://github.com/sponsors/shenwenAI" class="btn btn-secondary" target="_blank">
-                        Learn More
-                    </a>
-                </div>
-
-                <div class="payment-card">
-                    <div class="payment-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                            <path d="M8 21h8M12 17v4"/>
-                        </svg>
-                    </div>
-                    <h3>Sponsor Compute Card</h3>
-                    <p>You can donate a compute card to support our AI research through the following channels:</p>
-                    <ul style="text-align:left; margin: 0.75rem 0; padding-left: 1.2rem; line-height: 1.8;">
-                        <li><strong>Email:</strong> <a href="mailto:shenwenaibot@outlook.xyz">shenwenaibot@outlook.xyz</a></li>
-                        <li><strong>Mailing Address:</strong> No. 1176 Nanxiu Road, Xiaoshan District, Hangzhou, Zhejiang Province, China. Postal Code: 311201</li>
-                    </ul>
-                    <p style="font-size:0.875rem; color: var(--text-secondary);">Contact our bot via the email above to obtain a phone number.</p>
+                <!-- Register Form -->
+                <div class="auth-card" id="registerSection" style="display:none;">
+                    <h2>Register</h2>
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label for="registerName">Username</label>
+                            <input type="text" id="registerName" placeholder="Enter your username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerEmail">Email</label>
+                            <input type="email" id="registerEmail" placeholder="Enter your email" required autocomplete="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="registerPassword">Password</label>
+                            <input type="password" id="registerPassword" placeholder="Enter your password (minimum 6 characters)" required minlength="6" autocomplete="new-password">
+                        </div>
+                        <div class="form-group">
+                            <label for="registerConfirmPassword">Confirm Password</label>
+                            <input type="password" id="registerConfirmPassword" placeholder="Re-enter your password" required minlength="6" autocomplete="new-password">
+                        </div>
+                        <div id="registerMessage" class="auth-message" style="display:none;"></div>
+                        <button type="submit" class="btn btn-primary auth-btn">Register</button>
+                    </form>
+                    <p class="auth-switch">Already have an account? <a href="#" id="showLogin">Login now</a></p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- GitHub Section -->
-    <section class="github-section">
+    <!-- CTA Section -->
+    <section class="cta-section">
         <div class="container">
-            <div class="github-content">
-                <div class="github-info">
-                    <div class="github-icon">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
-                        </svg>
-                    </div>
-                    <h2>Join Our GitHub Organization</h2>
-                    <p>shenwenAI is an open-source project. We welcome developers to join our GitHub organization, contribute to projects, participate in discussions, and collaborate</p>
-                    <a href="https://github.com/shenwenAI" class="btn btn-primary" target="_blank">
-                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
-                        </svg>
-                        Visit GitHub Organization
-                    </a>
-                </div>
-                <div class="github-stats">
-                    <div class="stat-item">
-                        <span class="stat-number">15+</span>
-                        <span class="stat-label">Open Source Projects</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">500+</span>
-                        <span class="stat-label">Contributors</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">10K+</span>
-                        <span class="stat-label">Stars</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section class="faq-section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">FAQ</h2>
-                <p class="section-description">
-                    Frequently asked questions about sponsorship
-                </p>
-            </div>
-
-            <div class="faq-list">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>How will the sponsorship funds be used?</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="6 9 12 15 18 9"/>
-                        </svg>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Sponsorship funds will primarily be used for: server and maintenance costs, developers' daily expenses, R&D investment in new features, creation of documentation and tutorials, and organizing community events. We are committed to using every contribution to advance the shenwenAI project.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>How do I become a monthly sponsor?</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="6 9 12 15 18 9"/>
-                        </svg>
-                    </div>
-                    <div class="faq-answer">
-                        <p>You can set up monthly sponsorship through GitHub Sponsors. Visit our GitHub Sponsors page, select the amount you'd like to sponsor, and follow the instructions to complete the setup. Monthly sponsorship can be cancelled or adjusted at any time.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>What benefits do sponsors receive?</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="6 9 12 15 18 9"/>
-                        </svg>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Different sponsorship tiers offer different benefits, including but not limited to: logo display on our website, acknowledgment in our GitHub organization, access to an exclusive technical support channel, API call credits, one-on-one technical consultation, and joint press releases. Please refer to the sponsorship tier details for more information.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>How can I contact the sponsorship team?</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="6 9 12 15 18 9"/>
-                        </svg>
-                    </div>
-                    <div class="faq-answer">
-                        <p>You can reach us through the following channels:
-                        <br>Email: sponsor@shenwenai.com
-                        <br>GitHub: https://github.com/shenwenAI
-                        <br>We will respond to your inquiry within 24 hours.</p>
-                    </div>
+            <div class="cta-content">
+                <h2>Ready to use shenwenAI API?</h2>
+                <p>Get your API key after logging in</p>
+                <div class="cta-actions">
+                    <a href="api-en.html" class="btn btn-white">Go to API Service</a>
+                    <a href="payus-en.html" class="btn btn-outline-white">Sponsor Us</a>
                 </div>
             </div>
         </div>
@@ -298,6 +170,7 @@
                     <ul>
                         <li><a href="index-en.html">swllm.cpp</a></li>
                         <li><a href="model-en.html">shenwen-coder-0.5b</a></li>
+                        <li><a href="model-coderv2-en.html">shenwen-coderV2-Instruct</a></li>
                         <li><a href="api-en.html">API</a></li>
                         <li><a href="#">Docs</a></li>
                         <li><a href="#">Pricing</a></li>

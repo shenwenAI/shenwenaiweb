@@ -2552,3 +2552,126 @@ html.dark .moon-icon {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
+/* Auth Section Styles */
+.auth-section {
+    padding: 80px 0;
+    background: var(--bg-primary);
+}
+
+.auth-container {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.auth-card {
+    padding: 40px 32px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+}
+
+.auth-card h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 32px;
+    text-align: center;
+    color: var(--text-primary);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    transition: all var(--transition-base);
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-group input::placeholder {
+    color: var(--text-muted);
+}
+
+.auth-btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.auth-message {
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+.auth-message.error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.auth-message.success {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 24px;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.auth-switch a {
+    color: var(--brand-primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}
+
+/* Pricing grid with 2 cards */
+.pricing-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .auth-card {
+        padding: 32px 24px;
+    }
+
+    .pricing-grid-2 {
+        grid-template-columns: 1fr;
+    }
+}

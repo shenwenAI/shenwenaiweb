@@ -1,0 +1,10 @@
+# Node.js
+server/node_modules/
+server/data/
+
+# Environment
+server/.env
+
+# OS files
+.DS_Store
+Thumbs.db

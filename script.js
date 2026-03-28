@@ -15,6 +15,8 @@
         initSmoothScroll();
         initHeaderScroll();
         initFaqAccordion();
+        initGetApiHandler();
+        initAuthForms();
     });
 
     // ==================== 主题切换功能 ====================
@@ -534,5 +536,167 @@ console.log(data.choices[0].message);`
         setTimeout(initLicenseTypewriter, 800);
         initSponsorModal();
     });
+
+    // ==================== 后端 API 地址 ====================
+    // 部署后端后，将此地址改为你的服务器地址，例如：
+    // var AUTH_API_URL = 'https://shenwenapi.578388.xyz';
+    var AUTH_API_URL = 'https://shenwenapi.578388.xyz';
+
+    // ==================== 获取API处理 ====================
+    function initGetApiHandler() {
+        window.handleGetApi = function() {
+            var token = localStorage.getItem('shenwenai_token');
+            if (token) {
+                window.location.href = 'https://shenwenapi.578388.xyz';
+            } else {
+                var isEnglish = document.documentElement.lang === 'en';
+                window.location.href = isEnglish ? 'login-en.html' : 'login.html';
+            }
+        };
+    }
+
+    // ==================== 登录注册功能 ====================
+    function initAuthForms() {
+        var loginForm = document.getElementById('loginForm');
+        var registerForm = document.getElementById('registerForm');
+        var showRegisterLink = document.getElementById('showRegister');
+        var showLoginLink = document.getElementById('showLogin');
+        var loginSection = document.getElementById('loginSection');
+        var registerSection = document.getElementById('registerSection');
+
+        if (showRegisterLink && showLoginLink && loginSection && registerSection) {
+            showRegisterLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                loginSection.style.display = 'none';
+                registerSection.style.display = 'block';
+            });
+
+            showLoginLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                registerSection.style.display = 'none';
+                loginSection.style.display = 'block';
+            });
+        }
+
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var isEnglish = document.documentElement.lang === 'en';
+                var email = document.getElementById('loginEmail').value.trim();
+                var password = document.getElementById('loginPassword').value;
+
+                if (!email || !password) {
+                    showAuthMessage('loginMessage', isEnglish ? 'Please fill in all fields' : '请填写所有字段', 'error');
+                    return;
+                }
+
+                // 显示加载状态
+                var submitBtn = loginForm.querySelector('button[type="submit"]');
+                var originalText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                submitBtn.textContent = isEnglish ? 'Logging in...' : '登录中...';
+
+                fetch(AUTH_API_URL + '/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, password: password })
+                })
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        // 保存 token 和用户信息（不保存密码）
+                        localStorage.setItem('shenwenai_token', data.token);
+                        localStorage.setItem('shenwenai_user', JSON.stringify(data.user));
+                        showAuthMessage('loginMessage', isEnglish ? (data.message_en || 'Login successful! Redirecting...') : (data.message || '登录成功！正在跳转...'), 'success');
+                        setTimeout(function() {
+                            window.location.href = 'https://shenwenapi.578388.xyz';
+                        }, 1500);
+                    } else {
+                        showAuthMessage('loginMessage', isEnglish ? (data.message_en || 'Invalid email or password') : (data.message || '邮箱或密码错误'), 'error');
+                    }
+                })
+                .catch(function(err) {
+                    console.error('登录请求失败:', err);
+                    showAuthMessage('loginMessage', isEnglish ? 'Network error, please try again' : '网络错误，请稍后重试', 'error');
+                })
+                .finally(function() {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                });
+            });
+        }
+
+        if (registerForm) {
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var isEnglish = document.documentElement.lang === 'en';
+                var name = document.getElementById('registerName').value.trim();
+                var email = document.getElementById('registerEmail').value.trim();
+                var password = document.getElementById('registerPassword').value;
+                var confirmPassword = document.getElementById('registerConfirmPassword').value;
+
+                if (!name || !email || !password || !confirmPassword) {
+                    showAuthMessage('registerMessage', isEnglish ? 'Please fill in all fields' : '请填写所有字段', 'error');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    showAuthMessage('registerMessage', isEnglish ? 'Passwords do not match' : '两次密码输入不一致', 'error');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    showAuthMessage('registerMessage', isEnglish ? 'Password must be at least 6 characters' : '密码长度至少6位', 'error');
+                    return;
+                }
+
+                // 显示加载状态
+                var submitBtn = registerForm.querySelector('button[type="submit"]');
+                var originalText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                submitBtn.textContent = isEnglish ? 'Registering...' : '注册中...';
+
+                fetch(AUTH_API_URL + '/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: name, email: email, password: password })
+                })
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        // 保存 token 和用户信息（不保存密码）
+                        localStorage.setItem('shenwenai_token', data.token);
+                        localStorage.setItem('shenwenai_user', JSON.stringify(data.user));
+                        var successMsg = isEnglish
+                            ? (data.message_en || 'Registration successful!')
+                            : (data.message || '注册成功！');
+                        showAuthMessage('registerMessage', successMsg, 'success');
+                        setTimeout(function() {
+                            window.location.href = 'https://shenwenapi.578388.xyz';
+                        }, 3000);
+                    } else {
+                        showAuthMessage('registerMessage', isEnglish ? (data.message_en || 'Registration failed') : (data.message || '注册失败'), 'error');
+                    }
+                })
+                .catch(function(err) {
+                    console.error('注册请求失败:', err);
+                    showAuthMessage('registerMessage', isEnglish ? 'Network error, please try again' : '网络错误，请稍后重试', 'error');
+                })
+                .finally(function() {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                });
+            });
+        }
+    }
+
+    function showAuthMessage(elementId, message, type) {
+        var el = document.getElementById(elementId);
+        if (el) {
+            el.textContent = message;
+            el.className = 'auth-message ' + type;
+            el.style.display = 'block';
+        }
+    }
 
 })();
