@@ -25,6 +25,7 @@ var EMAIL_SECURE = process.env.EMAIL_SECURE !== 'false';
 var EMAIL_USER = process.env.EMAIL_USER || '';
 var EMAIL_PASS = process.env.EMAIL_PASS || '';
 var EMAIL_FROM = process.env.EMAIL_FROM || EMAIL_USER;
+var ADMIN_EMAIL = process.env.ADMIN_EMAIL || EMAIL_USER;
 
 var mailerTransport = null;
 if (EMAIL_HOST && EMAIL_USER && EMAIL_PASS) {
@@ -148,6 +149,13 @@ function getExpiresAt() {
     return new Date(Date.now() + TOKEN_EXPIRE_MS).toISOString();
 }
 
+/**
+ * HTML 转义，防止 XSS
+ */
+function escapeHtml(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 // ==================== 速率限制（防暴力破解） ====================
 var rateLimitMap = {};
 
@@ -190,7 +198,9 @@ function rateLimit(maxAttempts, windowMs) {
     };
 }
 
-// 定期清理过期的速率限制记录（每10分钟）
+// 联系表单: 每个 IP 每小时最多10次
+var contactLimiter = rateLimit(10, 60 * 60 * 1000);
+
 setInterval(function() {
     var now = Date.now();
     var keys = Object.keys(rateLimitMap);
@@ -655,6 +665,76 @@ app.post('/api/auth/change-password', async function(req, res) {
     } catch (err) {
         console.error('修改密码错误:', err);
         res.status(500).json({ success: false, message: '服务器错误，请稍后重试', message_en: 'Server error, please try again later' });
+    }
+});
+
+/**
+ * POST /api/contact - 联系管理员（发邮件给站长）
+ */
+app.post('/api/contact', contactLimiter, async function(req, res) {
+    try {
+        var senderName = (req.body.name || '').trim();
+        var senderEmail = (req.body.email || '').trim();
+        var subject = (req.body.subject || '').trim();
+        var message = (req.body.message || '').trim();
+
+        if (!senderName || !senderEmail || !message) {
+            return res.status(400).json({ success: false, message: '请填写姓名、邮箱和消息', message_en: 'Please fill in name, email and message' });
+        }
+        if (!isValidEmail(senderEmail)) {
+            return res.status(400).json({ success: false, message: '邮箱格式不正确', message_en: 'Invalid email format' });
+        }
+        if (senderName.length > 100) {
+            return res.status(400).json({ success: false, message: '姓名不能超过100个字符', message_en: 'Name cannot exceed 100 characters' });
+        }
+        if (subject.length > 200) {
+            return res.status(400).json({ success: false, message: '主题不能超过200个字符', message_en: 'Subject cannot exceed 200 characters' });
+        }
+        if (message.length > 5000) {
+            return res.status(400).json({ success: false, message: '消息不能超过5000个字符', message_en: 'Message cannot exceed 5000 characters' });
+        }
+
+        if (!mailerTransport) {
+            return res.status(503).json({ success: false, message: '邮件服务暂不可用，请联系管理员', message_en: 'Email service is unavailable, please contact the administrator' });
+        }
+        if (!ADMIN_EMAIL) {
+            return res.status(503).json({ success: false, message: '管理员邮箱未配置', message_en: 'Admin email is not configured' });
+        }
+
+        var emailSubject = subject ? '[shenwenAI 联系] ' + subject : '[shenwenAI 联系] 来自 ' + senderName + ' 的消息';
+        var html = [
+            '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;border:1px solid #e5e7eb;border-radius:8px;">',
+            '  <h2 style="color:#2563eb;margin-bottom:8px;">shenwenAI 联系消息</h2>',
+            '  <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">',
+            '    <tr><td style="padding:6px 0;color:#6b7280;width:80px;">姓名：</td><td style="padding:6px 0;color:#111827;">' + escapeHtml(senderName) + '</td></tr>',
+            '    <tr><td style="padding:6px 0;color:#6b7280;">邮箱：</td><td style="padding:6px 0;color:#111827;">' + escapeHtml(senderEmail) + '</td></tr>',
+            subject ? '    <tr><td style="padding:6px 0;color:#6b7280;">主题：</td><td style="padding:6px 0;color:#111827;">' + escapeHtml(subject) + '</td></tr>' : '',
+            '  </table>',
+            '  <div style="background:#f9fafb;border-left:4px solid #2563eb;padding:16px;border-radius:4px;white-space:pre-wrap;color:#374151;line-height:1.6;">',
+            escapeHtml(message),
+            '  </div>',
+            '  <p style="color:#6b7280;font-size:12px;margin-top:16px;">此邮件由 shenwenAI 网站联系表单自动发送，发件人 IP：' + (req.ip || 'unknown') + '</p>',
+            '</div>'
+        ].join('\n');
+
+        await mailerTransport.sendMail({
+            from: EMAIL_FROM,
+            to: ADMIN_EMAIL,
+            replyTo: senderEmail,
+            subject: emailSubject,
+            html: html
+        });
+
+        console.log('联系表单邮件已发送，来自:', senderEmail);
+
+        res.json({
+            success: true,
+            message: '消息已发送，感谢您的联系！',
+            message_en: 'Message sent successfully, thank you for contacting us!'
+        });
+    } catch (err) {
+        console.error('联系表单邮件发送错误:', err);
+        res.status(500).json({ success: false, message: '发送失败，请稍后重试', message_en: 'Failed to send message, please try again later' });
     }
 });
 
