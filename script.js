@@ -15,6 +15,8 @@
         initSmoothScroll();
         initHeaderScroll();
         initFaqAccordion();
+        initGetApiHandler();
+        initAuthForms();
     });
 
     // ==================== 主题切换功能 ====================
@@ -650,11 +652,5 @@ console.log(data.choices[0].message);`
             el.style.display = 'block';
         }
     }
-
-    // 在DOMContentLoaded中追加初始化
-    document.addEventListener('DOMContentLoaded', function() {
-        initGetApiHandler();
-        initAuthForms();
-    });
 
 })();
