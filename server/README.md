@@ -298,7 +298,28 @@ cp /opt/shenwenaiweb/server/data/users.db /opt/shenwenaiweb/server/data/users.db
 
 使用自定义域名邮箱（如 `noreply@578388.xyz`）发送验证码邮件，可以提升品牌形象和邮件送达率。
 
-### 概述
+### 一键配置（推荐）
+
+```bash
+cd /opt/shenwenaiweb/server
+sudo bash setup-email.sh
+```
+
+该脚本会自动完成：
+- 安装所需依赖（openssl、dnsutils）
+- 交互式选择 SMTP 服务并输入配置
+- 生成 DKIM 密钥对
+- 更新 `.env` 文件
+- 输出需要添加的 DNS 记录
+- 测试 SMTP 连接并发送测试邮件
+- 重启服务
+
+### 手动配置
+
+<details>
+<summary>点击展开手动配置步骤</summary>
+
+#### 概述
 
 配置步骤：
 1. 选择 SMTP 服务（自建或第三方）
@@ -307,7 +328,7 @@ cp /opt/shenwenaiweb/server/data/users.db /opt/shenwenaiweb/server/data/users.db
 4. 更新 `.env` 配置
 5. 测试验证
 
-### 第一步：选择 SMTP 服务
+#### 第一步：选择 SMTP 服务
 
 可以使用以下任一种方式：
 
@@ -317,23 +338,23 @@ cp /opt/shenwenaiweb/server/data/users.db /opt/shenwenaiweb/server/data/users.db
 | 第三方发信服务 | 大量发信 | Amazon SES、Mailgun、SendGrid |
 | 自建 SMTP | 完全控制 | Postfix、HMailServer |
 
-### 第二步：配置域名 DNS 记录
+#### 第二步：配置域名 DNS 记录
 
 在域名 DNS 管理面板（如 Cloudflare）添加以下记录：
 
-#### 1. MX 记录（可选，仅收信需要）
+##### 1. MX 记录（可选，仅收信需要）
 
 | 类型 | 名称 | 内容 | 优先级 |
 |------|------|------|--------|
 | MX | @ | mail.578388.xyz | 10 |
 
-#### 2. SPF 记录（必须）
+##### 2. SPF 记录（必须）
 
 SPF 指定哪些服务器可以代表你的域名发送邮件：
 
 | 类型 | 名称 | 内容 |
 |------|------|------|
-| TXT | @ | `v=spf1 mx a ip4:你的服务器IP include:_spf.google.com ~all` |
+| TXT | @ | `v=spf1 mx a ip4:你的服务器IP ~all` |
 
 > 根据你使用的 SMTP 服务调整 `include:` 部分。常用值：
 > - 腾讯企业邮: `include:spf.mail.qq.com`
@@ -341,7 +362,7 @@ SPF 指定哪些服务器可以代表你的域名发送邮件：
 > - Amazon SES: `include:amazonses.com`
 > - Mailgun: `include:mailgun.org`
 
-#### 3. DKIM 记录（推荐）
+##### 3. DKIM 记录（推荐）
 
 DKIM 使用公钥/私钥对邮件进行签名验证。生成密钥后需添加：
 
@@ -351,7 +372,7 @@ DKIM 使用公钥/私钥对邮件进行签名验证。生成密钥后需添加�
 
 > `default` 是 DKIM 选择器（selector），可自定义，需与 `.env` 中的 `DKIM_SELECTOR` 一致。
 
-#### 4. DMARC 记录（推荐）
+##### 4. DMARC 记录（推荐）
 
 DMARC 告诉收件方如何处理未通过 SPF/DKIM 验证的邮件：
 
@@ -359,7 +380,7 @@ DMARC 告诉收件方如何处理未通过 SPF/DKIM 验证的邮件：
 |------|------|------|
 | TXT | `_dmarc` | `v=DMARC1; p=quarantine; rua=mailto:admin@578388.xyz; pct=100` |
 
-### 第三步：生成 DKIM 密钥对
+#### 第三步：生成 DKIM 密钥对
 
 ```bash
 # 在服务器上生成 DKIM RSA 密钥对
@@ -374,7 +395,7 @@ cat /etc/dkim/public.key | grep -v '^-' | tr -d '\n'
 
 将提取的公钥内容填入上面的 DKIM DNS TXT 记录中的 `p=` 字段。
 
-### 第四步：更新 `.env` 配置
+#### 第四步：更新 `.env` 配置
 
 ```bash
 nano /opt/shenwenaiweb/server/.env
@@ -407,7 +428,7 @@ ADMIN_EMAIL=admin@578388.xyz
 pm2 restart shenwenai-auth
 ```
 
-### 第五步：测试邮件配置
+#### 第五步：测试邮件配置
 
 #### 方法一：使用 API 测试接口
 
@@ -438,7 +459,7 @@ dig TXT default._domainkey.578388.xyz +short
 dig TXT _dmarc.578388.xyz +short
 ```
 
-### 常见 SMTP 服务配置示例
+#### 常见 SMTP 服务配置示例
 
 <details>
 <summary>腾讯企业邮</summary>
@@ -505,10 +526,12 @@ EMAIL_FROM=shenwenAI <noreply@你的域名>
 ```
 </details>
 
-### 邮件相关故障排除
+#### 邮件相关故障排除
 
 1. **邮件进入垃圾箱**：检查 SPF、DKIM、DMARC DNS 记录是否正确配置
 2. **SMTP 连接失败**：确认 EMAIL_HOST/EMAIL_PORT/EMAIL_SECURE 配置正确，服务器防火墙允许 465/587 端口出站
 3. **DKIM 签名失败**：确认私钥文件路径正确且有读取权限（`chmod 600`），公钥已正确添加到 DNS
 4. **发件人地址被拒绝**：确认 EMAIL_FROM 地址与 SMTP 账户授权的发件人地址一致
 5. **邮件发送速率限制**：各 SMTP 服务商有每日发送限额，请参考对应服务商文档
+
+</details>

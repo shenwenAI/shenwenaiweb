@@ -761,7 +761,7 @@ app.post('/api/contact', contactLimiter, async function(req, res) {
 });
 
 /**
- * POST /api/email/verify-config - 验证邮件配置（仅管理员使用，需 ADMIN_SECRET）
+ * POST /api/email/verify-config - 验证邮件配置（仅管理员使用，需 TOKEN_SECRET）
  * 发送一封测试邮件到管理员邮箱，确认 SMTP + DKIM 设置正确
  */
 app.post('/api/email/verify-config', async function(req, res) {
@@ -776,15 +776,8 @@ app.post('/api/email/verify-config', async function(req, res) {
                 success: false,
                 message: '邮件服务未配置',
                 message_en: 'Email service is not configured',
-                config: {
-                    EMAIL_HOST: EMAIL_HOST ? '已设置' : '未设置',
-                    EMAIL_USER: EMAIL_USER ? '已设置' : '未设置',
-                    EMAIL_PASS: EMAIL_PASS ? '已设置' : '未设置',
-                    EMAIL_FROM: EMAIL_FROM || '未设置',
-                    DKIM_DOMAIN: DKIM_DOMAIN || '未设置',
-                    DKIM_SELECTOR: DKIM_SELECTOR || '未设置',
-                    DKIM_PRIVATE_KEY_PATH: DKIM_PRIVATE_KEY_PATH || '未设置'
-                }
+                hint: '请在 .env 中设置 EMAIL_HOST / EMAIL_USER / EMAIL_PASS',
+                hint_en: 'Please set EMAIL_HOST / EMAIL_USER / EMAIL_PASS in .env'
             });
         }
 
