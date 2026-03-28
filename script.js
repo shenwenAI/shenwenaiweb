@@ -536,3 +536,8 @@ console.log(data.choices[0].message);`
     });
 
 })();
+
+// Global handler for API buttons
+function handleGetApi() {
+    alert('API 服务即将上线，敬请期待！');
+}
