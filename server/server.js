@@ -12,8 +12,15 @@ var fs = require('fs');
 
 // ==================== 配置 ====================
 var PORT = process.env.PORT || 3000;
-var TOKEN_SECRET = process.env.TOKEN_SECRET || 'shenwenai-default-secret-change-me';
-var CORS_ORIGINS = (process.env.CORS_ORIGINS || 'http://localhost:8080').split(',').map(function(s) { return s.trim(); });
+var TOKEN_SECRET = process.env.TOKEN_SECRET || '';
+var CORS_ORIGINS = (process.env.CORS_ORIGINS || '*').split(',').map(function(s) { return s.trim(); });
+// Token 过期时间（毫秒），默认 7 天
+var TOKEN_EXPIRE_MS = parseInt(process.env.TOKEN_EXPIRE_DAYS || '7', 10) * 24 * 60 * 60 * 1000;
+
+if (!TOKEN_SECRET) {
+    console.warn('警告: TOKEN_SECRET 未设置，使用随机密钥（重启后所有 token 将失效）');
+    TOKEN_SECRET = crypto.randomBytes(32).toString('hex');
+}
 
 // ==================== 数据库初始化 ====================
 var initSqlJs = require('sql.js');
@@ -56,8 +63,8 @@ async function initDatabase() {
     // 创建用户表
     db.run("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)");
 
-    // 创建 tokens 表
-    db.run("CREATE TABLE IF NOT EXISTS tokens (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, token TEXT UNIQUE NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES users(id))");
+    // 创建 tokens 表（带过期时间）
+    db.run("CREATE TABLE IF NOT EXISTS tokens (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, token TEXT UNIQUE NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, expires_at DATETIME NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id))");
 
     saveDatabase();
     console.log('数据库初始化完成');
@@ -72,7 +79,6 @@ app.use(express.json());
 // CORS 跨域配置
 app.use(cors({
     origin: function (origin, callback) {
-        // 允许无 origin 的请求（如 curl、Postman）
         if (!origin) return callback(null, true);
         if (CORS_ORIGINS.indexOf(origin) !== -1 || CORS_ORIGINS.indexOf('*') !== -1) {
             callback(null, true);
@@ -86,18 +92,16 @@ app.use(cors({
 
 // ==================== 工具函数 ====================
 
-/**
- * 生成安全的 token
- */
 function generateToken() {
     return crypto.randomBytes(32).toString('hex');
 }
 
-/**
- * 验证邮箱格式
- */
 function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function getExpiresAt() {
+    return new Date(Date.now() + TOKEN_EXPIRE_MS).toISOString();
 }
 
 // ==================== API 路由 ====================
@@ -105,43 +109,23 @@ function isValidEmail(email) {
 /**
  * POST /api/auth/register - 用户注册
  */
-app.post('/api/auth/register', function(req, res) {
+app.post('/api/auth/register', async function(req, res) {
     try {
         var name = req.body.name;
         var email = req.body.email;
         var password = req.body.password;
 
-        // 参数验证
         if (!name || !email || !password) {
-            return res.status(400).json({
-                success: false,
-                message: '请填写所有字段',
-                message_en: 'Please fill in all fields'
-            });
+            return res.status(400).json({ success: false, message: '请填写所有字段', message_en: 'Please fill in all fields' });
         }
-
         if (!isValidEmail(email)) {
-            return res.status(400).json({
-                success: false,
-                message: '邮箱格式不正确',
-                message_en: 'Invalid email format'
-            });
+            return res.status(400).json({ success: false, message: '邮箱格式不正确', message_en: 'Invalid email format' });
         }
-
         if (password.length < 6) {
-            return res.status(400).json({
-                success: false,
-                message: '密码长度至少6位',
-                message_en: 'Password must be at least 6 characters'
-            });
+            return res.status(400).json({ success: false, message: '密码长度至少6位', message_en: 'Password must be at least 6 characters' });
         }
-
         if (name.length > 50) {
-            return res.status(400).json({
-                success: false,
-                message: '用户名不能超过50个字符',
-                message_en: 'Username cannot exceed 50 characters'
-            });
+            return res.status(400).json({ success: false, message: '用户名不能超过50个字符', message_en: 'Username cannot exceed 50 characters' });
         }
 
         // 检查邮箱是否已注册
@@ -149,29 +133,21 @@ app.post('/api/auth/register', function(req, res) {
         stmt.bind([email]);
         if (stmt.step()) {
             stmt.free();
-            return res.status(409).json({
-                success: false,
-                message: '该邮箱已注册',
-                message_en: 'This email is already registered'
-            });
+            return res.status(409).json({ success: false, message: '该邮箱已注册', message_en: 'This email is already registered' });
         }
         stmt.free();
 
-        // 密码加密
-        var salt = bcrypt.genSaltSync(10);
-        var hashedPassword = bcrypt.hashSync(password, salt);
+        // 异步密码加密
+        var salt = await bcrypt.genSalt(10);
+        var hashedPassword = await bcrypt.hash(password, salt);
 
-        // 插入用户
-        db.run('INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-            [name, email, hashedPassword]);
+        db.run('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [name, email, hashedPassword]);
 
-        // 获取新用户 ID
         var result = db.exec('SELECT last_insert_rowid() as id');
         var userId = result[0].values[0][0];
 
-        // 生成 token
         var token = generateToken();
-        db.run('INSERT INTO tokens (user_id, token) VALUES (?, ?)', [userId, token]);
+        db.run('INSERT INTO tokens (user_id, token, expires_at) VALUES (?, ?, ?)', [userId, token, getExpiresAt()]);
 
         saveDatabase();
         console.log('新用户注册:', email);
@@ -183,62 +159,41 @@ app.post('/api/auth/register', function(req, res) {
             user: { name: name, email: email },
             token: token
         });
-
     } catch (err) {
         console.error('注册错误:', err);
-        res.status(500).json({
-            success: false,
-            message: '服务器错误，请稍后重试',
-            message_en: 'Server error, please try again later'
-        });
+        res.status(500).json({ success: false, message: '服务器错误，请稍后重试', message_en: 'Server error, please try again later' });
     }
 });
 
 /**
  * POST /api/auth/login - 用户登录
  */
-app.post('/api/auth/login', function(req, res) {
+app.post('/api/auth/login', async function(req, res) {
     try {
         var email = req.body.email;
         var password = req.body.password;
 
-        // 参数验证
         if (!email || !password) {
-            return res.status(400).json({
-                success: false,
-                message: '请填写所有字段',
-                message_en: 'Please fill in all fields'
-            });
+            return res.status(400).json({ success: false, message: '请填写所有字段', message_en: 'Please fill in all fields' });
         }
 
-        // 查找用户
         var stmt = db.prepare('SELECT id, name, email, password FROM users WHERE email = ?');
         stmt.bind([email]);
         if (!stmt.step()) {
             stmt.free();
-            return res.status(401).json({
-                success: false,
-                message: '邮箱或密码错误',
-                message_en: 'Invalid email or password'
-            });
+            return res.status(401).json({ success: false, message: '邮箱或密码错误', message_en: 'Invalid email or password' });
         }
-
         var row = stmt.getAsObject();
         stmt.free();
 
-        // 验证密码
-        var valid = bcrypt.compareSync(password, row.password);
+        // 异步密码验证
+        var valid = await bcrypt.compare(password, row.password);
         if (!valid) {
-            return res.status(401).json({
-                success: false,
-                message: '邮箱或密码错误',
-                message_en: 'Invalid email or password'
-            });
+            return res.status(401).json({ success: false, message: '邮箱或密码错误', message_en: 'Invalid email or password' });
         }
 
-        // 生成新 token
         var token = generateToken();
-        db.run('INSERT INTO tokens (user_id, token) VALUES (?, ?)', [row.id, token]);
+        db.run('INSERT INTO tokens (user_id, token, expires_at) VALUES (?, ?, ?)', [row.id, token, getExpiresAt()]);
         saveDatabase();
 
         console.log('用户登录:', email);
@@ -250,14 +205,9 @@ app.post('/api/auth/login', function(req, res) {
             user: { name: row.name, email: row.email },
             token: token
         });
-
     } catch (err) {
         console.error('登录错误:', err);
-        res.status(500).json({
-            success: false,
-            message: '服务器错误，请稍后重试',
-            message_en: 'Server error, please try again later'
-        });
+        res.status(500).json({ success: false, message: '服务器错误，请稍后重试', message_en: 'Server error, please try again later' });
     }
 });
 
@@ -268,43 +218,27 @@ app.get('/api/auth/user', function(req, res) {
     try {
         var authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({
-                success: false,
-                message: '未登录',
-                message_en: 'Not logged in'
-            });
+            return res.status(401).json({ success: false, message: '未登录', message_en: 'Not logged in' });
         }
 
         var token = authHeader.slice(7);
         var stmt = db.prepare(
-            'SELECT users.name, users.email FROM tokens JOIN users ON tokens.user_id = users.id WHERE tokens.token = ?'
+            'SELECT users.name, users.email FROM tokens JOIN users ON tokens.user_id = users.id WHERE tokens.token = ? AND tokens.expires_at > datetime(?)'
         );
-        stmt.bind([token]);
+        stmt.bind([token, new Date().toISOString()]);
 
         if (!stmt.step()) {
             stmt.free();
-            return res.status(401).json({
-                success: false,
-                message: '登录已过期，请重新登录',
-                message_en: 'Session expired, please log in again'
-            });
+            return res.status(401).json({ success: false, message: '登录已过期，请重新登录', message_en: 'Session expired, please log in again' });
         }
 
         var row = stmt.getAsObject();
         stmt.free();
 
-        res.json({
-            success: true,
-            user: { name: row.name, email: row.email }
-        });
-
+        res.json({ success: true, user: { name: row.name, email: row.email } });
     } catch (err) {
         console.error('验证错误:', err);
-        res.status(500).json({
-            success: false,
-            message: '服务器错误',
-            message_en: 'Server error'
-        });
+        res.status(500).json({ success: false, message: '服务器错误', message_en: 'Server error' });
     }
 });
 
@@ -319,9 +253,7 @@ app.post('/api/auth/logout', function(req, res) {
             db.run('DELETE FROM tokens WHERE token = ?', [token]);
             saveDatabase();
         }
-
         res.json({ success: true, message: '已退出登录', message_en: 'Logged out' });
-
     } catch (err) {
         console.error('退出错误:', err);
         res.status(500).json({ success: false, message: '服务器错误', message_en: 'Server error' });
@@ -346,7 +278,17 @@ initDatabase().then(function() {
     process.exit(1);
 });
 
-// 优雅关闭 - 保存数据库
+// 定时清理过期 token（每小时）
+setInterval(function() {
+    try {
+        if (db) {
+            db.run('DELETE FROM tokens WHERE expires_at < datetime(?)', [new Date().toISOString()]);
+            saveDatabase();
+        }
+    } catch (e) { /* ignore */ }
+}, 60 * 60 * 1000);
+
+// 优雅关闭
 process.on('SIGINT', function() {
     console.log('正在关闭服务器...');
     saveDatabase();

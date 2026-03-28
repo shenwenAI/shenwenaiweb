@@ -82,10 +82,10 @@ nano .env
 ```
 PORT=3000
 CORS_ORIGINS=https://shenwen.578388.xyz,https://578388.xyz
-TOKEN_SECRET=换成一个随机字符串比如abc123xyz456
+TOKEN_SECRET=（用下面的命令生成）
 ```
 
-**生成随机密钥**（推荐）：
+**⚠️ 必须生成安全的随机密钥**：
 ```bash
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
