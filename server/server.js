@@ -9,7 +9,6 @@ var bcrypt = require('bcryptjs');
 var crypto = require('crypto');
 var path = require('path');
 var fs = require('fs');
-var https = require('https');
 var nodemailer = require('nodemailer');
 
 // ==================== 配置 ====================
@@ -33,8 +32,8 @@ var DKIM_DOMAIN = process.env.DKIM_DOMAIN || '';
 var DKIM_SELECTOR = process.env.DKIM_SELECTOR || 'default';
 var DKIM_PRIVATE_KEY_PATH = process.env.DKIM_PRIVATE_KEY_PATH || '';
 
-// Cloudflare Turnstile 人机验证配置
-var CF_TURNSTILE_SECRET_KEY = process.env.CF_TURNSTILE_SECRET_KEY || '';
+// 验证码配置
+var CAPTCHA_EXPIRE_MS = 5 * 60 * 1000; // 验证码有效期5分钟
 
 var mailerTransport = null;
 if (EMAIL_HOST && EMAIL_USER && EMAIL_PASS) {
@@ -71,66 +70,82 @@ if (!TOKEN_SECRET) {
     TOKEN_SECRET = crypto.randomBytes(32).toString('hex');
 }
 
-if (!CF_TURNSTILE_SECRET_KEY) {
-    console.warn('警告: CF_TURNSTILE_SECRET_KEY 未设置，Cloudflare Turnstile 人机验证不可用');
+// ==================== 图形验证码 ====================
+// 验证码存储: { [captchaId]: { code, expiresAt } }
+var captchaStore = {};
+
+// 定期清理过期验证码（每2分钟）
+setInterval(function() {
+    var now = Date.now();
+    var keys = Object.keys(captchaStore);
+    for (var i = 0; i < keys.length; i++) {
+        if (now > captchaStore[keys[i]].expiresAt) {
+            delete captchaStore[keys[i]];
+        }
+    }
+}, 2 * 60 * 1000);
+
+/**
+ * 生成4位数字验证码
+ */
+function generateCaptchaCode() {
+    return String(crypto.randomInt(1000, 10000));
 }
 
 /**
- * 验证 Cloudflare Turnstile 人机验证 token
- * @param {string} token - 前端传来的 Turnstile token
- * @param {string} ip - 客户端 IP
- * @returns {Promise<boolean>} 验证是否通过
+ * 生成验证码 SVG 图片
+ * @param {string} code - 4位验证码
+ * @returns {string} SVG 字符串
  */
-async function verifyTurnstileToken(token, ip) {
-    if (!CF_TURNSTILE_SECRET_KEY) {
-        // 未配置密钥时跳过验证（开发环境），生产环境应配置密钥
-        console.warn('Turnstile 验证已跳过: CF_TURNSTILE_SECRET_KEY 未配置');
-        return true;
+function generateCaptchaSvg(code) {
+    var width = 120;
+    var height = 40;
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '">';
+    // 背景
+    svg += '<rect width="' + width + '" height="' + height + '" fill="#f0f0f0" rx="4"/>';
+    // 干扰线
+    for (var i = 0; i < 4; i++) {
+        var x1 = Math.floor(Math.random() * width);
+        var y1 = Math.floor(Math.random() * height);
+        var x2 = Math.floor(Math.random() * width);
+        var y2 = Math.floor(Math.random() * height);
+        var colors = ['#ccc', '#aaa', '#ddd', '#bbb'];
+        svg += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + colors[i] + '" stroke-width="1"/>';
     }
-    if (!token) {
-        return false;
+    // 干扰点
+    for (var j = 0; j < 20; j++) {
+        var cx = Math.floor(Math.random() * width);
+        var cy = Math.floor(Math.random() * height);
+        var dotColors = ['#ccc', '#aaa', '#999', '#bbb'];
+        svg += '<circle cx="' + cx + '" cy="' + cy + '" r="1" fill="' + dotColors[j % 4] + '"/>';
     }
-    return new Promise(function(resolve) {
-        try {
-            var postData = JSON.stringify({
-                secret: CF_TURNSTILE_SECRET_KEY,
-                response: token,
-                remoteip: ip
-            });
-            var options = {
-                hostname: 'challenges.cloudflare.com',
-                port: 443,
-                path: '/turnstile/v0/siteverify',
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': Buffer.byteLength(postData)
-                }
-            };
-            var req = https.request(options, function(res) {
-                var body = '';
-                res.on('data', function(chunk) { body += chunk; });
-                res.on('end', function() {
-                    try {
-                        var data = JSON.parse(body);
-                        resolve(data.success === true);
-                    } catch (e) {
-                        console.error('Turnstile 响应解析失败:', e);
-                        resolve(false);
-                    }
-                });
-            });
-            req.on('error', function(err) {
-                console.error('Turnstile 验证请求失败:', err);
-                resolve(false);
-            });
-            req.write(postData);
-            req.end();
-        } catch (err) {
-            console.error('Turnstile 验证错误:', err);
-            resolve(false);
-        }
-    });
+    // 文字
+    var charColors = ['#333', '#555', '#222', '#444'];
+    for (var k = 0; k < code.length; k++) {
+        var x = 15 + k * 26;
+        var y = 28 + Math.floor(Math.random() * 6) - 3;
+        var rotate = Math.floor(Math.random() * 20) - 10;
+        var fontSize = 22 + Math.floor(Math.random() * 4);
+        svg += '<text x="' + x + '" y="' + y + '" font-size="' + fontSize + '" font-weight="bold" fill="' + charColors[k % charColors.length] + '" transform="rotate(' + rotate + ' ' + x + ' ' + y + ')">' + code[k] + '</text>';
+    }
+    svg += '</svg>';
+    return svg;
+}
+
+/**
+ * 验证图形验证码
+ * @param {string} captchaId - 验证码 ID
+ * @param {string} captchaCode - 用户输入的验证码
+ * @returns {boolean} 验证是否通过
+ */
+function verifyCaptcha(captchaId, captchaCode) {
+    if (!captchaId || !captchaCode || !captchaCode.trim()) return false;
+    var entry = captchaStore[captchaId];
+    if (!entry) return false;
+    // 验证码只能使用一次
+    delete captchaStore[captchaId];
+    if (Date.now() > entry.expiresAt) return false;
+    return entry.code === captchaCode.trim();
 }
 
 // ==================== 数据库初始化 ====================
@@ -364,15 +379,30 @@ async function sendChangePasswordEmail(email, name, code) {
 
 // ==================== API 路由 ====================
 
+// 验证码获取: 每个 IP 每分钟最多20次
+var captchaLimiter = rateLimit(20, 60 * 1000);
+
 /**
- * POST /api/auth/register - 用户注册（使用 Cloudflare Turnstile 人机验证，无需邮件验证码）
+ * GET /api/captcha - 获取图形验证码
+ */
+app.get('/api/captcha', captchaLimiter, function(req, res) {
+    var code = generateCaptchaCode();
+    var captchaId = crypto.randomBytes(16).toString('hex');
+    captchaStore[captchaId] = { code: code, expiresAt: Date.now() + CAPTCHA_EXPIRE_MS };
+    var svg = generateCaptchaSvg(code);
+    res.json({ success: true, captchaId: captchaId, svg: svg });
+});
+
+/**
+ * POST /api/auth/register - 用户注册（使用图形验证码）
  */
 app.post('/api/auth/register', registerLimiter, async function(req, res) {
     try {
         var name = (req.body.name || '').trim();
         var email = (req.body.email || '').trim();
         var password = req.body.password;
-        var turnstileToken = (req.body.turnstileToken || '').trim();
+        var captchaId = (req.body.captchaId || '').trim();
+        var captchaCode = (req.body.captchaCode || '').trim();
 
         if (!name || !email || !password) {
             return res.status(400).json({ success: false, message: '请填写所有字段', message_en: 'Please fill in all fields' });
@@ -387,10 +417,9 @@ app.post('/api/auth/register', registerLimiter, async function(req, res) {
             return res.status(400).json({ success: false, message: '用户名不能超过50个字符', message_en: 'Username cannot exceed 50 characters' });
         }
 
-        // Cloudflare Turnstile 人机验证
-        var turnstileOk = await verifyTurnstileToken(turnstileToken, req.ip || '');
-        if (!turnstileOk) {
-            return res.status(403).json({ success: false, message: '人机验证失败，请重试', message_en: 'Human verification failed, please try again' });
+        // 图形验证码验证
+        if (!verifyCaptcha(captchaId, captchaCode)) {
+            return res.status(403).json({ success: false, message: '验证码错误或已过期，请重新获取', message_en: 'Captcha is incorrect or expired, please refresh' });
         }
 
         // 检查邮箱是否已注册
@@ -431,22 +460,22 @@ app.post('/api/auth/register', registerLimiter, async function(req, res) {
 });
 
 /**
- * POST /api/auth/login - 用户登录（使用 Cloudflare Turnstile 人机验证）
+ * POST /api/auth/login - 用户登录（使用图形验证码）
  */
 app.post('/api/auth/login', loginLimiter, async function(req, res) {
     try {
         var email = req.body.email;
         var password = req.body.password;
-        var turnstileToken = (req.body.turnstileToken || '').trim();
+        var captchaId = (req.body.captchaId || '').trim();
+        var captchaCode = (req.body.captchaCode || '').trim();
 
         if (!email || !password) {
             return res.status(400).json({ success: false, message: '请填写所有字段', message_en: 'Please fill in all fields' });
         }
 
-        // Cloudflare Turnstile 人机验证
-        var turnstileOk = await verifyTurnstileToken(turnstileToken, req.ip || '');
-        if (!turnstileOk) {
-            return res.status(403).json({ success: false, message: '人机验证失败，请重试', message_en: 'Human verification failed, please try again' });
+        // 图形验证码验证
+        if (!verifyCaptcha(captchaId, captchaCode)) {
+            return res.status(403).json({ success: false, message: '验证码错误或已过期，请重新获取', message_en: 'Captcha is incorrect or expired, please refresh' });
         }
 
         var stmt = db.prepare('SELECT id, name, email, password FROM users WHERE email = ?');

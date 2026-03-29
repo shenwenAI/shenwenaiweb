@@ -69,8 +69,7 @@ CORS_ORIGINS=https://578388.xyz,https://shenwen.578388.xyz,https://shenwenapi.57
 TOKEN_SECRET=$TOKEN_SECRET
 TOKEN_EXPIRE_DAYS=7
 
-# Cloudflare Turnstile 人机验证（请在 Cloudflare 仪表板中获取）
-# CF_TURNSTILE_SECRET_KEY=你的Turnstile密钥
+# 图形验证码无需额外配置
 ENVEOF
     echo "  .env 文件已生成（TOKEN_SECRET 已自动生成）"
 else

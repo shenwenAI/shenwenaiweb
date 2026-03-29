@@ -6,8 +6,8 @@
 
 ## 功能
 
-- 用户注册（密码 bcrypt 加密存储，Cloudflare Turnstile 人机验证）
-- 用户登录（Token 认证，Cloudflare Turnstile 人机验证）
+- 用户注册（密码 bcrypt 加密存储，图形验证码）
+- 用户登录（Token 认证，图形验证码）
 - 用户信息查询
 - 退出登录
 - 修改密码（邮件验证码）
@@ -18,8 +18,9 @@
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
-| POST | `/api/auth/register` | 用户注册（Turnstile 人机验证） |
-| POST | `/api/auth/login` | 用户登录（Turnstile 人机验证） |
+| GET | `/api/captcha` | 获取图形验证码 |
+| POST | `/api/auth/register` | 用户注册（图形验证码） |
+| POST | `/api/auth/login` | 用户登录（图形验证码） |
 | GET | `/api/auth/user` | 获取当前用户信息 |
 | POST | `/api/auth/logout` | 退出登录 |
 | POST | `/api/auth/send-change-password-code` | 发送修改密码验证码 |
@@ -282,76 +283,31 @@ systemctl reload nginx
 # 测试健康检查
 curl https://shenwenapi.578388.xyz/api/health
 
-# 测试注册（Turnstile 未配置时可直接注册）
+# 测试注册（需先获取验证码）
+# 1. 获取验证码
+curl https://shenwenapi.578388.xyz/api/captcha
+# 2. 使用返回的 captchaId 和验证码进行注册
 curl -X POST https://shenwenapi.578388.xyz/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"name":"测试用户","email":"test@example.com","password":"Test@123!"}'
+  -d '{"name":"测试用户","email":"test@example.com","password":"Test@123!","captchaId":"<captchaId>","captchaCode":"<code>"}'
 
-# 测试登录
+# 测试登录（需先获取验证码）
 curl -X POST https://shenwenapi.578388.xyz/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"Test@123!"}'
+  -d '{"email":"test@example.com","password":"Test@123!","captchaId":"<captchaId>","captchaCode":"<code>"}'
 ```
 
 </details>
 
 ---
 
-## Cloudflare Turnstile 人机验证配置
+## 图形验证码
 
-Turnstile 是 Cloudflare 提供的免费人机验证服务，用于替代传统的邮件验证码，防止机器人注册和暴力破解。
+登录和注册使用服务器端生成的4位数字图形验证码（SVG），无需任何第三方服务配置。
 
-### 第一步：创建 Turnstile 站点
-
-1. 登录 [Cloudflare 仪表板](https://dash.cloudflare.com)
-2. 进入 **Turnstile** 页面（左侧菜单）
-3. 点击 **添加站点 (Add Site)**
-4. 填写信息：
-   - **站点名称**: `shenwenAI`
-   - **域名**: `578388.xyz`（或你的前端域名）
-   - **Widget 模式**: 选择 **Managed**（推荐，自动判断是否需要交互验证）
-5. 点击 **创建 (Create)**
-6. 记录生成的 **Site Key** 和 **Secret Key**
-
-### 第二步：配置后端 Secret Key
-
-```bash
-# 编辑 .env 文件
-nano /opt/shenwenai-auth/.env
-
-# 添加以下配置：
-CF_TURNSTILE_SECRET_KEY=0x4AAAAAAA...你的SecretKey
-```
-
-重启服务：
-```bash
-pm2 restart shenwenai-auth
-```
-
-### 第三步：配置前端 Site Key
-
-在 `login.html` 和 `login-en.html` 中，将所有 `data-sitekey="YOUR_CF_TURNSTILE_SITE_KEY"` 替换为你的实际 Site Key：
-
-```html
-<div class="cf-turnstile" data-sitekey="0x4AAAAAAA...你的SiteKey" data-theme="auto"></div>
-```
-
-### 第四步：验证配置
-
-1. 打开登录页面，确认 Turnstile 组件正常显示
-2. 尝试注册新用户，确认人机验证通过后可以成功注册
-3. 尝试登录，确认人机验证通过后可以成功登录
-
-### Turnstile 测试密钥
-
-开发和测试时可以使用 Cloudflare 提供的测试密钥：
-
-| 类型 | 密钥 | 说明 |
-|------|------|------|
-| Site Key (始终通过) | `1x00000000000000000000AA` | 始终通过验证 |
-| Site Key (始终失败) | `2x00000000000000000000AB` | 始终失败 |
-| Secret Key (始终通过) | `1x0000000000000000000000000000000AA` | 始终通过验证 |
-| Secret Key (始终失败) | `2x0000000000000000000000000000000AA` | 始终失败 |
+- 验证码有效期：5分钟
+- 验证码为一次性使用，提交后自动失效
+- 获取验证码接口有速率限制（每 IP 每分钟最多20次）
 
 ---
 
