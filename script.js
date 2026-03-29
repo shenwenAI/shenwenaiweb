@@ -17,6 +17,7 @@
         initFaqAccordion();
         initGetApiHandler();
         initAuthForms();
+        initCaptcha();
         initDashboard();
         initContactForm();
     });
@@ -581,6 +582,42 @@ console.log(data.choices[0].message);`
     }
 
     // ==================== 登录注册功能 ====================
+
+    // ---- 图形验证码功能 ----
+    var loginCaptchaId = '';
+    var registerCaptchaId = '';
+
+    function loadCaptcha(imgElementId, type) {
+        fetch(AUTH_API_URL + '/api/captcha')
+            .then(handleApiResponse)
+            .then(function(data) {
+                if (data.success) {
+                    if (type === 'login') loginCaptchaId = data.captchaId;
+                    else registerCaptchaId = data.captchaId;
+                    var imgEl = document.getElementById(imgElementId);
+                    if (imgEl) imgEl.innerHTML = data.svg;
+                }
+            })
+            .catch(function() {});
+    }
+
+    function initCaptcha() {
+        var loginImg = document.getElementById('loginCaptchaImg');
+        var registerImg = document.getElementById('registerCaptchaImg');
+        if (loginImg) {
+            loadCaptcha('loginCaptchaImg', 'login');
+            loginImg.addEventListener('click', function() {
+                loadCaptcha('loginCaptchaImg', 'login');
+            });
+        }
+        if (registerImg) {
+            loadCaptcha('registerCaptchaImg', 'register');
+            registerImg.addEventListener('click', function() {
+                loadCaptcha('registerCaptchaImg', 'register');
+            });
+        }
+    }
+
     function initAuthForms() {
         var loginForm = document.getElementById('loginForm');
         var registerForm = document.getElementById('registerForm');
@@ -630,19 +667,16 @@ console.log(data.choices[0].message);`
                 var isEnglish = document.documentElement.lang === 'en';
                 var email = document.getElementById('loginEmail').value.trim();
                 var password = document.getElementById('loginPassword').value;
+                var captchaInput = document.getElementById('loginCaptcha');
+                var captchaCode = captchaInput ? captchaInput.value.trim() : '';
 
                 if (!email || !password) {
                     showAuthMessage('loginMessage', isEnglish ? 'Please fill in all fields' : '请填写所有字段', 'error');
                     return;
                 }
-
-                // 获取 Cloudflare Turnstile token
-                var turnstileResponse = '';
-                if (typeof turnstile !== 'undefined') {
-                    var loginWidget = document.querySelector('#loginTurnstile iframe');
-                    if (loginWidget) {
-                        turnstileResponse = turnstile.getResponse(document.querySelector('#loginTurnstile'));
-                    }
+                if (!captchaCode) {
+                    showAuthMessage('loginMessage', isEnglish ? 'Please enter the captcha' : '请输入验证码', 'error');
+                    return;
                 }
 
                 // 显示加载状态
@@ -654,7 +688,7 @@ console.log(data.choices[0].message);`
                 fetch(AUTH_API_URL + '/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email, password: password, turnstileToken: turnstileResponse })
+                    body: JSON.stringify({ email: email, password: password, captchaId: loginCaptchaId, captchaCode: captchaCode })
                 })
                 .then(handleApiResponse)
                 .then(function(data) {
@@ -667,20 +701,15 @@ console.log(data.choices[0].message);`
                         }, 1500);
                     } else {
                         showAuthMessage('loginMessage', isEnglish ? (data.message_en || 'Invalid email or password') : (data.message || '邮箱或密码错误'), 'error');
-                        // 重置 Turnstile
-                        if (typeof turnstile !== 'undefined') {
-                            var el = document.querySelector('#loginTurnstile');
-                            if (el) turnstile.reset(el);
-                        }
+                        loadCaptcha('loginCaptchaImg', 'login');
+                        if (captchaInput) captchaInput.value = '';
                     }
                 })
                 .catch(function(err) {
                     console.error('登录请求失败:', err);
                     showAuthMessage('loginMessage', getNetworkErrorMessage(err, isEnglish), 'error');
-                    if (typeof turnstile !== 'undefined') {
-                        var el = document.querySelector('#loginTurnstile');
-                        if (el) turnstile.reset(el);
-                    }
+                    loadCaptcha('loginCaptchaImg', 'login');
+                    if (captchaInput) captchaInput.value = '';
                 })
                 .finally(function() {
                     submitBtn.disabled = false;
@@ -690,7 +719,7 @@ console.log(data.choices[0].message);`
         }
 
         if (registerForm) {
-            // 直接注册（无需邮件验证码，使用 Cloudflare Turnstile 人机验证）
+            // 直接注册（使用图形验证码）
             registerForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 var isEnglish = document.documentElement.lang === 'en';
@@ -698,6 +727,8 @@ console.log(data.choices[0].message);`
                 var email = document.getElementById('registerEmail').value.trim();
                 var password = document.getElementById('registerPassword').value;
                 var confirmPassword = document.getElementById('registerConfirmPassword').value;
+                var captchaInput = document.getElementById('registerCaptcha');
+                var captchaCode = captchaInput ? captchaInput.value.trim() : '';
 
                 if (!name || !email || !password || !confirmPassword) {
                     showAuthMessage('registerMessage', isEnglish ? 'Please fill in all fields' : '请填写所有字段', 'error');
@@ -711,14 +742,9 @@ console.log(data.choices[0].message);`
                     showAuthMessage('registerMessage', isEnglish ? 'Password must be at least 8 characters and contain letters and special characters' : '密码须至少8位，包含字母和特殊符号', 'error');
                     return;
                 }
-
-                // 获取 Cloudflare Turnstile token
-                var turnstileResponse = '';
-                if (typeof turnstile !== 'undefined') {
-                    var registerWidget = document.querySelector('#registerTurnstile iframe');
-                    if (registerWidget) {
-                        turnstileResponse = turnstile.getResponse(document.querySelector('#registerTurnstile'));
-                    }
+                if (!captchaCode) {
+                    showAuthMessage('registerMessage', isEnglish ? 'Please enter the captcha' : '请输入验证码', 'error');
+                    return;
                 }
 
                 // 显示加载状态
@@ -730,7 +756,7 @@ console.log(data.choices[0].message);`
                 fetch(AUTH_API_URL + '/api/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: name, email: email, password: password, turnstileToken: turnstileResponse })
+                    body: JSON.stringify({ name: name, email: email, password: password, captchaId: registerCaptchaId, captchaCode: captchaCode })
                 })
                 .then(handleApiResponse)
                 .then(function(data) {
@@ -746,19 +772,15 @@ console.log(data.choices[0].message);`
                         }, 3000);
                     } else {
                         showAuthMessage('registerMessage', isEnglish ? (data.message_en || 'Registration failed') : (data.message || '注册失败'), 'error');
-                        if (typeof turnstile !== 'undefined') {
-                            var el = document.querySelector('#registerTurnstile');
-                            if (el) turnstile.reset(el);
-                        }
+                        loadCaptcha('registerCaptchaImg', 'register');
+                        if (captchaInput) captchaInput.value = '';
                     }
                 })
                 .catch(function(err) {
                     console.error('注册请求失败:', err);
                     showAuthMessage('registerMessage', getNetworkErrorMessage(err, isEnglish), 'error');
-                    if (typeof turnstile !== 'undefined') {
-                        var el = document.querySelector('#registerTurnstile');
-                        if (el) turnstile.reset(el);
-                    }
+                    loadCaptcha('registerCaptchaImg', 'register');
+                    if (captchaInput) captchaInput.value = '';
                 })
                 .finally(function() {
                     submitBtn.disabled = false;

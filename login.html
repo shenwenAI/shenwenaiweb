@@ -10,7 +10,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
     <!-- Header -->
@@ -88,8 +87,13 @@
                             <label for="loginPassword">密码</label>
                             <input type="password" id="loginPassword" placeholder="请输入密码" required autocomplete="current-password">
                         </div>
-                        <!-- 请将 YOUR_CF_TURNSTILE_SITE_KEY 替换为你的 Cloudflare Turnstile Site Key -->
-                        <div class="cf-turnstile" data-sitekey="YOUR_CF_TURNSTILE_SITE_KEY" data-theme="auto" id="loginTurnstile"></div>
+                        <div class="form-group">
+                            <label for="loginCaptcha">验证码</label>
+                            <div class="captcha-row">
+                                <input type="text" id="loginCaptcha" placeholder="请输入验证码" required maxlength="4" autocomplete="off">
+                                <div class="captcha-img" id="loginCaptchaImg" title="点击刷新验证码"></div>
+                            </div>
+                        </div>
                         <div id="loginMessage" class="auth-message" style="display:none;"></div>
                         <button type="submit" class="btn btn-primary auth-btn">登录</button>
                     </form>
@@ -116,8 +120,13 @@
                             <label for="registerConfirmPassword">确认密码</label>
                             <input type="password" id="registerConfirmPassword" placeholder="请再次输入密码" required minlength="8" autocomplete="new-password">
                         </div>
-                        <!-- 请将 YOUR_CF_TURNSTILE_SITE_KEY 替换为你的 Cloudflare Turnstile Site Key -->
-                        <div class="cf-turnstile" data-sitekey="YOUR_CF_TURNSTILE_SITE_KEY" data-theme="auto" id="registerTurnstile"></div>
+                        <div class="form-group">
+                            <label for="registerCaptcha">验证码</label>
+                            <div class="captcha-row">
+                                <input type="text" id="registerCaptcha" placeholder="请输入验证码" required maxlength="4" autocomplete="off">
+                                <div class="captcha-img" id="registerCaptchaImg" title="点击刷新验证码"></div>
+                            </div>
+                        </div>
                         <div id="registerMessage" class="auth-message" style="display:none;"></div>
                         <button type="submit" class="btn btn-primary auth-btn" id="registerSubmitBtn">注册</button>
                     </form>

@@ -106,13 +106,9 @@ CORS_ORIGINS=https://578388.xyz,https://shenwen.578388.xyz,https://shenwenapi.57
 TOKEN_SECRET=$TOKEN_SECRET
 TOKEN_EXPIRE_DAYS=7
 
-# Cloudflare Turnstile 人机验证（请在 Cloudflare 仪表板中获取）
-# CF_TURNSTILE_SECRET_KEY=你的Turnstile密钥
+# 图形验证码无需额外配置
 ENVEOF
     echo "  .env 文件已生成（TOKEN_SECRET 已自动生成）"
-    echo ""
-    echo "  ⚠️  请编辑 $PROJECT_DIR/.env 配置 Cloudflare Turnstile 密钥："
-    echo "     nano $PROJECT_DIR/.env"
     echo ""
 else
     echo "  .env 文件已存在，跳过"
@@ -240,16 +236,7 @@ echo "    pm2 restart shenwenai-auth    # 重启"
 echo ""
 echo "  ==================== 重要配置 ===================="
 echo ""
-echo "  1. 编辑 $PROJECT_DIR/.env 配置 Cloudflare Turnstile 密钥"
-echo "     nano $PROJECT_DIR/.env"
-echo ""
-echo "  2. Cloudflare Turnstile 人机验证设置:"
-echo "     a) 登录 Cloudflare 仪表板 -> Turnstile"
-echo "     b) 创建站点，获取 Site Key 和 Secret Key"
-echo "     c) 将 Secret Key 填入 .env 的 CF_TURNSTILE_SECRET_KEY"
-echo "     d) 将 Site Key 填入前端 login.html / login-en.html 的 data-sitekey 属性"
-echo ""
-echo "  3. Cloudflare HTTPS 配置:"
+echo "  1. Cloudflare HTTPS 配置:"
 echo "     a) 在 Cloudflare 仪表板设置 DNS A 记录指向服务器 IP（已代理/橙色云朵）"
 echo "     b) SSL/TLS 加密模式设置为 Full (strict)"
 echo "     c) 生成 Origin 证书并保存到:"
