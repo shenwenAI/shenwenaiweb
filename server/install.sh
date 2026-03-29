@@ -81,7 +81,7 @@ else
         cp "$TEMP_DIR/server/send-email.js" "$PROJECT_DIR/"
     fi
     # 复制辅助脚本
-    for script in deploy.sh setup-email.sh setup-cloudflare-https.sh upgrade.sh; do
+    for script in deploy.sh setup-email.sh setup-cloudflare-https.sh setup-website-proxy.sh upgrade.sh; do
         if [ -f "$TEMP_DIR/server/$script" ]; then
             cp "$TEMP_DIR/server/$script" "$PROJECT_DIR/"
         fi
