@@ -920,65 +920,15 @@ console.log(data.choices[0].message);`
         }
 
         // 修改密码
-        var sendChangePwCodeBtn = document.getElementById('sendChangePwCodeBtn');
-        var changePwSubmitBtn = document.getElementById('changePwSubmitBtn');
-        var changePwCodeGroup = document.getElementById('changePwCodeGroup');
-        var changePwCountdownTimer = null;
-
-        if (sendChangePwCodeBtn) {
-            sendChangePwCodeBtn.addEventListener('click', function() {
-                var originalText = sendChangePwCodeBtn.textContent;
-                sendChangePwCodeBtn.disabled = true;
-                sendChangePwCodeBtn.textContent = isEnglish ? 'Sending...' : '发送中...';
-
-                fetchWithTimeout(AUTH_API_URL + '/api/auth/send-change-password-code', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
-                })
-                .then(handleApiResponse)
-                .then(function(data) {
-                    if (data.success) {
-                        showAuthMessage('changePwMessage', isEnglish ? (data.message_en || 'Verification code sent!') : (data.message || '验证码已发送！'), 'success');
-                        if (changePwCodeGroup) changePwCodeGroup.style.display = 'block';
-                        if (changePwSubmitBtn) changePwSubmitBtn.style.display = 'block';
-                        sendChangePwCodeBtn.style.display = 'none';
-                        var countdown = 60;
-                        if (changePwCountdownTimer) clearInterval(changePwCountdownTimer);
-                        changePwCountdownTimer = setInterval(function() {
-                            countdown--;
-                            if (countdown <= 0) {
-                                clearInterval(changePwCountdownTimer);
-                                changePwCountdownTimer = null;
-                                sendChangePwCodeBtn.disabled = false;
-                                sendChangePwCodeBtn.textContent = isEnglish ? 'Resend Code' : '重新发送验证码';
-                                sendChangePwCodeBtn.style.display = 'block';
-                            } else {
-                                sendChangePwCodeBtn.textContent = isEnglish ? 'Resend (' + countdown + 's)' : '重新发送 (' + countdown + 's)';
-                            }
-                        }, 1000);
-                    } else {
-                        sendChangePwCodeBtn.disabled = false;
-                        sendChangePwCodeBtn.textContent = originalText;
-                        showAuthMessage('changePwMessage', isEnglish ? (data.message_en || 'Failed to send code') : (data.message || '发送失败'), 'error');
-                    }
-                })
-                .catch(function(err) {
-                    sendChangePwCodeBtn.disabled = false;
-                    sendChangePwCodeBtn.textContent = originalText;
-                    showAuthMessage('changePwMessage', getNetworkErrorMessage(err, isEnglish), 'error');
-                });
-            });
-        }
-
         var changePwForm = document.getElementById('changePwForm');
         if (changePwForm) {
             changePwForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+                var currentPassword = document.getElementById('changePwCurrent') ? document.getElementById('changePwCurrent').value : '';
                 var newPassword = document.getElementById('changePwNew').value;
                 var confirmPassword = document.getElementById('changePwConfirm').value;
-                var code = document.getElementById('changePwCode') ? document.getElementById('changePwCode').value.trim() : '';
 
-                if (!newPassword || !confirmPassword || !code) {
+                if (!currentPassword || !newPassword || !confirmPassword) {
                     showAuthMessage('changePwMessage', isEnglish ? 'Please fill in all fields' : '请填写所有字段', 'error');
                     return;
                 }
@@ -991,23 +941,20 @@ console.log(data.choices[0].message);`
                     return;
                 }
 
+                var changePwSubmitBtn = document.getElementById('changePwSubmitBtn');
                 var originalText = changePwSubmitBtn ? changePwSubmitBtn.textContent : '';
                 if (changePwSubmitBtn) { changePwSubmitBtn.disabled = true; changePwSubmitBtn.textContent = isEnglish ? 'Saving...' : '保存中...'; }
 
                 fetchWithTimeout(AUTH_API_URL + '/api/auth/change-password', {
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ newPassword: newPassword, code: code })
+                    body: JSON.stringify({ currentPassword: currentPassword, newPassword: newPassword })
                 })
                 .then(handleApiResponse)
                 .then(function(data) {
                     if (data.success) {
                         showAuthMessage('changePwMessage', isEnglish ? (data.message_en || 'Password changed successfully!') : (data.message || '密码修改成功！'), 'success');
                         changePwForm.reset();
-                        if (changePwCodeGroup) changePwCodeGroup.style.display = 'none';
-                        if (changePwSubmitBtn) changePwSubmitBtn.style.display = 'none';
-                        if (sendChangePwCodeBtn) { sendChangePwCodeBtn.style.display = 'block'; sendChangePwCodeBtn.disabled = false; sendChangePwCodeBtn.textContent = isEnglish ? 'Send Verification Code' : '发送验证码'; }
-                        if (changePwCountdownTimer) { clearInterval(changePwCountdownTimer); changePwCountdownTimer = null; }
                     } else {
                         showAuthMessage('changePwMessage', isEnglish ? (data.message_en || 'Failed to change password') : (data.message || '修改密码失败'), 'error');
                     }

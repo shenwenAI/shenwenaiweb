@@ -10,7 +10,7 @@
 - 用户登录（Token 认证，图形验证码）
 - 用户信息查询
 - 退出登录
-- 修改密码（邮件验证码）
+- 修改密码（需验证当前密码）
 - 联系表单
 - 健康检查接口
 
@@ -23,7 +23,6 @@
 | POST | `/api/auth/login` | 用户登录（图形验证码） |
 | GET | `/api/auth/user` | 获取当前用户信息 |
 | POST | `/api/auth/logout` | 退出登录 |
-| POST | `/api/auth/send-change-password-code` | 发送修改密码验证码 |
 | POST | `/api/auth/change-password` | 修改密码 |
 | POST | `/api/contact` | 联系管理员 |
 | GET | `/api/health` | 健康检查 |
@@ -372,7 +371,7 @@ cp /opt/shenwenaiweb/server/data/users.db /opt/shenwenaiweb/server/data/users.db
 
 ## 自定义域名邮箱配置（Custom Domain Email Setup）
 
-使用自定义域名邮箱（如 `noreply@578388.xyz`）发送验证码邮件，可以提升品牌形象和邮件送达率。
+使用自定义域名邮箱（如 `noreply@578388.xyz`）发送邮件，可以提升品牌形象和邮件送达率。
 
 ### 一键配置（推荐）
 
