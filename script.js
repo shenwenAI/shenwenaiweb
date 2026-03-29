@@ -591,7 +591,7 @@ console.log(data.choices[0].message);`
     function fetchWithTimeout(url, options, timeoutMs) {
         timeoutMs = timeoutMs || 30000;
         options = options || {};
-        options.mode = 'cors';
+        options.mode = options.mode || 'cors';
 
         if (typeof AbortController !== 'undefined') {
             var controller = new AbortController();

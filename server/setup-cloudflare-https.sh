@@ -174,7 +174,7 @@ server {
         proxy_cache_bypass \$http_upgrade;
 
         # 超时设置（防止 Cloudflare 524 超时错误）
-        proxy_connect_timeout 10s;
+        proxy_connect_timeout 15s;
         proxy_send_timeout 30s;
         proxy_read_timeout 30s;
 
