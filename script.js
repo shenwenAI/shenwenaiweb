@@ -598,7 +598,7 @@ console.log(data.choices[0].message);`
                     if (imgEl) imgEl.innerHTML = data.svg;
                 }
             })
-            .catch(function() {});
+            .catch(function(err) { console.error('验证码加载失败:', err); });
     }
 
     function initCaptcha() {

@@ -126,7 +126,7 @@ function generateCaptchaSvg(code) {
         var y = 28 + Math.floor(Math.random() * 6) - 3;
         var rotate = Math.floor(Math.random() * 20) - 10;
         var fontSize = 22 + Math.floor(Math.random() * 4);
-        svg += '<text x="' + x + '" y="' + y + '" font-size="' + fontSize + '" font-weight="bold" fill="' + charColors[k] + '" transform="rotate(' + rotate + ' ' + x + ' ' + y + ')">' + code[k] + '</text>';
+        svg += '<text x="' + x + '" y="' + y + '" font-size="' + fontSize + '" font-weight="bold" fill="' + charColors[k % charColors.length] + '" transform="rotate(' + rotate + ' ' + x + ' ' + y + ')">' + code[k] + '</text>';
     }
     svg += '</svg>';
     return svg;
@@ -139,7 +139,7 @@ function generateCaptchaSvg(code) {
  * @returns {boolean} 验证是否通过
  */
 function verifyCaptcha(captchaId, captchaCode) {
-    if (!captchaId || !captchaCode) return false;
+    if (!captchaId || !captchaCode || !captchaCode.trim()) return false;
     var entry = captchaStore[captchaId];
     if (!entry) return false;
     // 验证码只能使用一次
