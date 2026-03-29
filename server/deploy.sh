@@ -65,7 +65,7 @@ if [ ! -f "$PROJECT_DIR/.env" ]; then
     TOKEN_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
     cat > "$PROJECT_DIR/.env" << ENVEOF
 PORT=3000
-CORS_ORIGINS=https://578388.xyz,https://shenwen.578388.xyz,https://shenwenapi.578388.xyz,http://578388.xyz
+CORS_ORIGINS=https://578388.xyz,https://shenwen.578388.xyz,https://shenwenapi.578388.xyz,https://shenwenaiweb.pages.dev,https://*.shenwenaiweb.pages.dev,http://578388.xyz
 TOKEN_SECRET=$TOKEN_SECRET
 TOKEN_EXPIRE_DAYS=7
 

@@ -114,7 +114,7 @@ nano .env
 修改 `.env` 文件内容：
 ```
 PORT=3000
-CORS_ORIGINS=https://shenwen.578388.xyz,https://578388.xyz
+CORS_ORIGINS=https://shenwen.578388.xyz,https://578388.xyz,https://shenwenaiweb.pages.dev,https://*.shenwenaiweb.pages.dev
 TOKEN_SECRET=（用下面的命令生成）
 ```
 
@@ -361,7 +361,7 @@ cp /opt/shenwenaiweb/server/data/users.db /opt/shenwenaiweb/server/data/users.db
 ## 故障排除
 
 1. **端口被占用**：修改 `.env` 中的 `PORT`
-2. **CORS 错误**：确认 `.env` 中的 `CORS_ORIGINS` 包含你的前端域名
+2. **CORS 错误**：确认 `.env` 中的 `CORS_ORIGINS` 包含你的前端域名（支持通配符，如 `https://*.shenwenaiweb.pages.dev`）
 3. **数据库错误**：检查 `data/` 目录的写入权限（`chmod 755 data/`）
 4. **PM2 问题**：`pm2 logs` 查看详细错误日志
 5. **Cloudflare 521 错误**：确认 Nginx 和后端服务正在运行（`pm2 status` 和 `systemctl status nginx`）
