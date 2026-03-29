@@ -259,7 +259,35 @@ systemctl reload nginx
 
 </details>
 
-### 第九步：配置 Cloudflare 仪表板
+### 第九步（可选）：一键配置网站反向代理至 8443 端口
+
+如果需要将静态网站通过 Nginx 反向代理在 8443 端口提供服务（当 443 端口已被 API 后端占用时），可以运行：
+
+**前提条件**：已将 Cloudflare Origin 证书上传到服务器：
+- 证书: `/etc/ssl/cloudflare/shenwen.578388.xyz.pem`
+- 私钥: `/etc/ssl/cloudflare/shenwen.578388.xyz.key`
+
+```bash
+# 一键配置网站反向代理至 8443 端口
+sudo bash setup-website-proxy.sh
+
+# 自定义域名
+DOMAIN=example.com sudo bash setup-website-proxy.sh
+```
+
+该脚本会自动完成：
+- 安装 Git、Nginx 等基础工具
+- 验证 SSL 证书文件存在并设置正确权限
+- 从 GitHub 下载最新网站静态文件到 `/var/www/shenwenai-web`
+- 生成 Nginx 配置（Cloudflare IP 还原 + HTTPS 端口 8443 + 静态文件服务）
+- 配置 Gzip 压缩和静态资源缓存
+- 启用配置并重载 Nginx
+- 验证端口 8443 监听状态
+
+> **注意**: 8443 是 Cloudflare 支持的 HTTPS 端口之一（443, 2053, 2083, 2087, 2096, 8443）。
+> 配置完成后，需要在 Cloudflare Origin Rules 中设置 Origin Port 为 8443。
+
+### 第十步：配置 Cloudflare 仪表板
 
 1. **Cloudflare DNS 设置**：
    - 登录 [Cloudflare 仪表板](https://dash.cloudflare.com)
@@ -277,7 +305,7 @@ systemctl reload nginx
    /etc/ssl/cloudflare/shenwenapi.578388.xyz.key  (私钥)
    ```
 
-### 第十步：测试 API
+### 第十一步：测试 API
 
 ```bash
 # 测试健康检查
