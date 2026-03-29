@@ -161,6 +161,15 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header CF-Connecting-IP $http_cf_connecting_ip;
         proxy_cache_bypass $http_upgrade;
+
+        # 代理超时设置（防止 Cloudflare 524 超时错误）
+        proxy_connect_timeout 15s;
+        proxy_send_timeout 30s;
+        proxy_read_timeout 30s;
+
+        # 禁止 Nginx 缓存 API 响应
+        proxy_no_cache 1;
+        proxy_cache_bypass 1;
     }
 
     location / {

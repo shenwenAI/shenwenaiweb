@@ -546,11 +546,34 @@ console.log(data.choices[0].message);`
     var AUTH_API_URL = 'https://shenwenapi.578388.xyz';
 
     // ==================== API 响应处理 ====================
+    // Cloudflare CDN 特殊状态码（520-527 表示源站问题）
+    var CLOUDFLARE_ERROR_CODES = {
+        520: 'Web server returned an unknown error',
+        521: 'Web server is down',
+        522: 'Connection timed out',
+        523: 'Origin is unreachable',
+        524: 'A timeout occurred',
+        525: 'SSL handshake failed',
+        526: 'Invalid SSL certificate',
+        527: 'Railgun error'
+    };
+
     function handleApiResponse(response) {
         return response.text().then(function(text) {
             try {
                 return JSON.parse(text);
             } catch (e) {
+                // 检测 Cloudflare CDN 错误页面（通常返回 HTML 而非 JSON）
+                var cfError = CLOUDFLARE_ERROR_CODES[response.status];
+                if (cfError) {
+                    return { success: false, message: '服务器暂时不可用 (CF ' + response.status + ')', message_en: 'Server temporarily unavailable (CF ' + response.status + ': ' + cfError + ')' };
+                }
+                if (response.status === 403) {
+                    return { success: false, message: '请求被安全策略拦截，请稍后重试', message_en: 'Request blocked by security policy, please try again later' };
+                }
+                if (response.status === 503) {
+                    return { success: false, message: '服务器维护中，请稍后重试', message_en: 'Server is under maintenance, please try again later' };
+                }
                 if (!response.ok) {
                     return { success: false, message: '服务器错误 (' + response.status + ')', message_en: 'Server error (' + response.status + ')' };
                 }
@@ -559,10 +582,42 @@ console.log(data.choices[0].message);`
         });
     }
 
+    /**
+     * 带超时的 fetch 封装，防止 Cloudflare CDN 超时导致请求无限挂起
+     * @param {string} url - 请求地址
+     * @param {Object} options - fetch 选项
+     * @param {number} timeoutMs - 超时时间（毫秒），默认30秒
+     */
+    function fetchWithTimeout(url, options, timeoutMs) {
+        timeoutMs = timeoutMs || 30000;
+        options = options || {};
+        options.mode = options.mode || 'cors';
+
+        if (typeof AbortController !== 'undefined') {
+            var controller = new AbortController();
+            options.signal = controller.signal;
+            var timeoutId = setTimeout(function() { controller.abort(); }, timeoutMs);
+            return fetch(url, options).finally(function() { clearTimeout(timeoutId); });
+        }
+        // 降级：不支持 AbortController 的浏览器使用 Promise.race
+        return Promise.race([
+            fetch(url, options),
+            new Promise(function(_, reject) {
+                setTimeout(function() { reject(new Error('请求超时')); }, timeoutMs);
+            })
+        ]);
+    }
+
     function getNetworkErrorMessage(err, isEnglish) {
         var msg = err && err.message ? err.message : '';
         if (msg.indexOf('Failed to fetch') !== -1 || msg.indexOf('NetworkError') !== -1 || msg.indexOf('Network request failed') !== -1) {
             return isEnglish ? 'Unable to connect to server, please check your network and try again' : '无法连接到服务器，请检查网络后重试';
+        }
+        if (msg.indexOf('aborted') !== -1 || msg.indexOf('请求超时') !== -1 || msg.indexOf('timeout') !== -1) {
+            return isEnglish ? 'Request timed out, server may be busy, please try again' : '请求超时，服务器可能繁忙，请稍后重试';
+        }
+        if (msg.indexOf('CORS') !== -1 || msg.indexOf('cross-origin') !== -1 || msg.indexOf('不允许的跨域') !== -1) {
+            return isEnglish ? 'Cross-origin request blocked, please refresh and try again' : '跨域请求被拦截，请刷新页面后重试';
         }
         return isEnglish ? 'Network error, please try again' : '网络错误，请稍后重试';
     }
@@ -588,7 +643,7 @@ console.log(data.choices[0].message);`
     var registerCaptchaId = '';
 
     function loadCaptcha(imgElementId, type) {
-        fetch(AUTH_API_URL + '/api/captcha')
+        fetchWithTimeout(AUTH_API_URL + '/api/captcha')
             .then(handleApiResponse)
             .then(function(data) {
                 if (data.success) {
@@ -685,7 +740,7 @@ console.log(data.choices[0].message);`
                 submitBtn.disabled = true;
                 submitBtn.textContent = isEnglish ? 'Logging in...' : '登录中...';
 
-                fetch(AUTH_API_URL + '/api/auth/login', {
+                fetchWithTimeout(AUTH_API_URL + '/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: email, password: password, captchaId: loginCaptchaId, captchaCode: captchaCode })
@@ -753,7 +808,7 @@ console.log(data.choices[0].message);`
                 submitBtn.disabled = true;
                 submitBtn.textContent = isEnglish ? 'Registering...' : '注册中...';
 
-                fetch(AUTH_API_URL + '/api/auth/register', {
+                fetchWithTimeout(AUTH_API_URL + '/api/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name: name, email: email, password: password, captchaId: registerCaptchaId, captchaCode: captchaCode })
@@ -813,7 +868,7 @@ console.log(data.choices[0].message);`
         }
 
         // 从后端获取用户信息
-        fetch(AUTH_API_URL + '/api/auth/user', {
+        fetchWithTimeout(AUTH_API_URL + '/api/auth/user', {
             headers: { 'Authorization': 'Bearer ' + token }
         })
         .then(handleApiResponse)
@@ -853,7 +908,7 @@ console.log(data.choices[0].message);`
         var logoutBtn = document.getElementById('dashLogoutBtn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', function() {
-                fetch(AUTH_API_URL + '/api/auth/logout', {
+                fetchWithTimeout(AUTH_API_URL + '/api/auth/logout', {
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + token }
                 }).catch(function() { /* ignore */ }).finally(function() {
@@ -876,7 +931,7 @@ console.log(data.choices[0].message);`
                 sendChangePwCodeBtn.disabled = true;
                 sendChangePwCodeBtn.textContent = isEnglish ? 'Sending...' : '发送中...';
 
-                fetch(AUTH_API_URL + '/api/auth/send-change-password-code', {
+                fetchWithTimeout(AUTH_API_URL + '/api/auth/send-change-password-code', {
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
                 })
@@ -939,7 +994,7 @@ console.log(data.choices[0].message);`
                 var originalText = changePwSubmitBtn ? changePwSubmitBtn.textContent : '';
                 if (changePwSubmitBtn) { changePwSubmitBtn.disabled = true; changePwSubmitBtn.textContent = isEnglish ? 'Saving...' : '保存中...'; }
 
-                fetch(AUTH_API_URL + '/api/auth/change-password', {
+                fetchWithTimeout(AUTH_API_URL + '/api/auth/change-password', {
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
                     body: JSON.stringify({ newPassword: newPassword, code: code })
@@ -991,7 +1046,7 @@ console.log(data.choices[0].message);`
             submitBtn.disabled = true;
             submitBtn.textContent = isEnglish ? 'Sending...' : '发送中...';
 
-            fetch(AUTH_API_URL + '/api/contact', {
+            fetchWithTimeout(AUTH_API_URL + '/api/contact', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: name, email: email, subject: subject, message: message })
