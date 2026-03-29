@@ -215,10 +215,24 @@ app.use(function(req, res, next) {
 });
 
 // CORS 跨域配置
+// 支持通配符模式，如 https://*.shenwenaiweb.pages.dev
+function matchCorsOrigin(origin) {
+    for (var i = 0; i < CORS_ORIGINS.length; i++) {
+        var allowed = CORS_ORIGINS[i];
+        if (allowed === '*' || allowed === origin) return true;
+        // 支持通配符子域名匹配，如 https://*.example.com
+        if (allowed.indexOf('*') !== -1) {
+            var pattern = allowed.replace(/\./g, '\\.').replace(/\*/g, '[a-zA-Z0-9-]+');
+            if (new RegExp('^' + pattern + '$').test(origin)) return true;
+        }
+    }
+    return false;
+}
+
 app.use(cors({
     origin: function (origin, callback) {
         if (!origin) return callback(null, true);
-        if (CORS_ORIGINS.indexOf(origin) !== -1 || CORS_ORIGINS.indexOf('*') !== -1) {
+        if (matchCorsOrigin(origin)) {
             callback(null, true);
         } else {
             console.log('CORS 拒绝来源:', origin);
