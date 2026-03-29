@@ -88,6 +88,7 @@
                             <label for="loginPassword">Password</label>
                             <input type="password" id="loginPassword" placeholder="Enter your password" required autocomplete="current-password">
                         </div>
+                        <!-- Replace YOUR_CF_TURNSTILE_SITE_KEY with your Cloudflare Turnstile Site Key -->
                         <div class="cf-turnstile" data-sitekey="YOUR_CF_TURNSTILE_SITE_KEY" data-theme="auto" id="loginTurnstile"></div>
                         <div id="loginMessage" class="auth-message" style="display:none;"></div>
                         <button type="submit" class="btn btn-primary auth-btn">Login</button>
@@ -115,6 +116,7 @@
                             <label for="registerConfirmPassword">Confirm Password</label>
                             <input type="password" id="registerConfirmPassword" placeholder="Re-enter your password" required minlength="8" autocomplete="new-password">
                         </div>
+                        <!-- Replace YOUR_CF_TURNSTILE_SITE_KEY with your Cloudflare Turnstile Site Key -->
                         <div class="cf-turnstile" data-sitekey="YOUR_CF_TURNSTILE_SITE_KEY" data-theme="auto" id="registerTurnstile"></div>
                         <div id="registerMessage" class="auth-message" style="display:none;"></div>
                         <button type="submit" class="btn btn-primary auth-btn" id="registerSubmitBtn">Register</button>

@@ -83,7 +83,8 @@ if (!CF_TURNSTILE_SECRET_KEY) {
  */
 async function verifyTurnstileToken(token, ip) {
     if (!CF_TURNSTILE_SECRET_KEY) {
-        // 未配置密钥时跳过验证
+        // 未配置密钥时跳过验证（开发环境），生产环境应配置密钥
+        console.warn('Turnstile 验证已跳过: CF_TURNSTILE_SECRET_KEY 未配置');
         return true;
     }
     if (!token) {

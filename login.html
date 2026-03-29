@@ -88,6 +88,7 @@
                             <label for="loginPassword">密码</label>
                             <input type="password" id="loginPassword" placeholder="请输入密码" required autocomplete="current-password">
                         </div>
+                        <!-- 请将 YOUR_CF_TURNSTILE_SITE_KEY 替换为你的 Cloudflare Turnstile Site Key -->
                         <div class="cf-turnstile" data-sitekey="YOUR_CF_TURNSTILE_SITE_KEY" data-theme="auto" id="loginTurnstile"></div>
                         <div id="loginMessage" class="auth-message" style="display:none;"></div>
                         <button type="submit" class="btn btn-primary auth-btn">登录</button>
@@ -115,6 +116,7 @@
                             <label for="registerConfirmPassword">确认密码</label>
                             <input type="password" id="registerConfirmPassword" placeholder="请再次输入密码" required minlength="8" autocomplete="new-password">
                         </div>
+                        <!-- 请将 YOUR_CF_TURNSTILE_SITE_KEY 替换为你的 Cloudflare Turnstile Site Key -->
                         <div class="cf-turnstile" data-sitekey="YOUR_CF_TURNSTILE_SITE_KEY" data-theme="auto" id="registerTurnstile"></div>
                         <div id="registerMessage" class="auth-message" style="display:none;"></div>
                         <button type="submit" class="btn btn-primary auth-btn" id="registerSubmitBtn">注册</button>
