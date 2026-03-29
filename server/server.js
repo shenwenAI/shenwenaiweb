@@ -9,6 +9,7 @@ var bcrypt = require('bcryptjs');
 var crypto = require('crypto');
 var path = require('path');
 var fs = require('fs');
+var https = require('https');
 var nodemailer = require('nodemailer');
 
 // ==================== 配置 ====================
@@ -31,6 +32,9 @@ var ADMIN_EMAIL = process.env.ADMIN_EMAIL || EMAIL_USER;
 var DKIM_DOMAIN = process.env.DKIM_DOMAIN || '';
 var DKIM_SELECTOR = process.env.DKIM_SELECTOR || 'default';
 var DKIM_PRIVATE_KEY_PATH = process.env.DKIM_PRIVATE_KEY_PATH || '';
+
+// Cloudflare Turnstile 人机验证配置
+var CF_TURNSTILE_SECRET_KEY = process.env.CF_TURNSTILE_SECRET_KEY || '';
 
 var mailerTransport = null;
 if (EMAIL_HOST && EMAIL_USER && EMAIL_PASS) {
@@ -59,12 +63,74 @@ if (EMAIL_HOST && EMAIL_USER && EMAIL_PASS) {
     mailerTransport = nodemailer.createTransport(transportOptions);
     console.log('邮件服务已配置: ' + EMAIL_HOST + ' (发件人: ' + EMAIL_FROM + ')');
 } else {
-    console.warn('警告: 邮件配置未设置，注册验证码功能不可用（请设置 EMAIL_HOST/EMAIL_USER/EMAIL_PASS 环境变量）');
+    console.warn('警告: 邮件配置未设置，修改密码和联系表单功能不可用（请设置 EMAIL_HOST/EMAIL_USER/EMAIL_PASS 环境变量）');
 }
 
 if (!TOKEN_SECRET) {
     console.warn('警告: TOKEN_SECRET 未设置，使用随机密钥（重启后所有 token 将失效）');
     TOKEN_SECRET = crypto.randomBytes(32).toString('hex');
+}
+
+if (!CF_TURNSTILE_SECRET_KEY) {
+    console.warn('警告: CF_TURNSTILE_SECRET_KEY 未设置，Cloudflare Turnstile 人机验证不可用');
+}
+
+/**
+ * 验证 Cloudflare Turnstile 人机验证 token
+ * @param {string} token - 前端传来的 Turnstile token
+ * @param {string} ip - 客户端 IP
+ * @returns {Promise<boolean>} 验证是否通过
+ */
+async function verifyTurnstileToken(token, ip) {
+    if (!CF_TURNSTILE_SECRET_KEY) {
+        // 未配置密钥时跳过验证（开发环境），生产环境应配置密钥
+        console.warn('Turnstile 验证已跳过: CF_TURNSTILE_SECRET_KEY 未配置');
+        return true;
+    }
+    if (!token) {
+        return false;
+    }
+    return new Promise(function(resolve) {
+        try {
+            var postData = JSON.stringify({
+                secret: CF_TURNSTILE_SECRET_KEY,
+                response: token,
+                remoteip: ip
+            });
+            var options = {
+                hostname: 'challenges.cloudflare.com',
+                port: 443,
+                path: '/turnstile/v0/siteverify',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': Buffer.byteLength(postData)
+                }
+            };
+            var req = https.request(options, function(res) {
+                var body = '';
+                res.on('data', function(chunk) { body += chunk; });
+                res.on('end', function() {
+                    try {
+                        var data = JSON.parse(body);
+                        resolve(data.success === true);
+                    } catch (e) {
+                        console.error('Turnstile 响应解析失败:', e);
+                        resolve(false);
+                    }
+                });
+            });
+            req.on('error', function(err) {
+                console.error('Turnstile 验证请求失败:', err);
+                resolve(false);
+            });
+            req.write(postData);
+            req.end();
+        } catch (err) {
+            console.error('Turnstile 验证错误:', err);
+            resolve(false);
+        }
+    });
 }
 
 // ==================== 数据库初始化 ====================
@@ -239,14 +305,10 @@ var changePasswordCodeLimiter = rateLimit(5, 10 * 60 * 1000);
 var loginLimiter = rateLimit(10, 15 * 60 * 1000);
 // 注册: 每个 IP 每小时最多5次
 var registerLimiter = rateLimit(5, 60 * 60 * 1000);
-// 发送验证码: 每个 IP 每10分钟最多5次
-var sendCodeLimiter = rateLimit(5, 10 * 60 * 1000);
 // 邮件配置验证: 每个 IP 每小时最多3次
 var emailVerifyLimiter = rateLimit(3, 60 * 60 * 1000);
 
-// ==================== 邮箱验证码存储 ====================
-// 结构: { [email]: { code, name, password, expiresAt } }
-var pendingVerifications = {};
+// ==================== 修改密码验证码存储 ====================
 // 修改密码验证码存储: { [email]: { code, expiresAt, sentAt } }
 var pendingPasswordChanges = {};
 
@@ -258,12 +320,6 @@ var RESEND_COOLDOWN_MS = 60 * 1000;
 // 定期清理过期验证码（每5分钟）
 setInterval(function() {
     var now = Date.now();
-    var keys = Object.keys(pendingVerifications);
-    for (var i = 0; i < keys.length; i++) {
-        if (now > pendingVerifications[keys[i]].expiresAt) {
-            delete pendingVerifications[keys[i]];
-        }
-    }
     var pwKeys = Object.keys(pendingPasswordChanges);
     for (var j = 0; j < pwKeys.length; j++) {
         if (now > pendingPasswordChanges[pwKeys[j]].expiresAt) {
@@ -277,33 +333,6 @@ setInterval(function() {
  */
 function generateVerificationCode() {
     return String(crypto.randomInt(100000, 1000000));
-}
-
-/**
- * 发送双语验证码邮件
- */
-async function sendVerificationEmail(email, name, code) {
-    if (!mailerTransport) {
-        throw new Error('邮件服务未配置');
-    }
-    var subject = 'shenwenAI 注册验证码 / Registration Verification Code';
-    var html = [
-        '<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;border:1px solid #e5e7eb;border-radius:8px;">',
-        '  <h2 style="color:#2563eb;margin-bottom:8px;">shenwenAI</h2>',
-        '  <p style="color:#374151;">您好 ' + name + '，/ Hello ' + name + ',</p>',
-        '  <p style="color:#374151;">您的注册验证码是：<br>Your registration verification code is:</p>',
-        '  <div style="font-size:36px;font-weight:bold;letter-spacing:8px;color:#2563eb;text-align:center;padding:16px 0;">' + code + '</div>',
-        '  <p style="color:#6b7280;font-size:13px;">验证码有效期10分钟，请尽快完成注册。<br>The code is valid for 10 minutes. Please complete registration promptly.</p>',
-        '  <p style="color:#6b7280;font-size:13px;">如果您没有在 shenwenAI 进行注册，请忽略此邮件。<br>If you did not register at shenwenAI, please ignore this email.</p>',
-        '</div>'
-    ].join('\n');
-
-    await mailerTransport.sendMail({
-        from: EMAIL_FROM,
-        to: email,
-        subject: subject,
-        html: html
-    });
 }
 
 /**
@@ -336,13 +365,14 @@ async function sendChangePasswordEmail(email, name, code) {
 // ==================== API 路由 ====================
 
 /**
- * POST /api/auth/send-code - 发送注册验证码
+ * POST /api/auth/register - 用户注册（使用 Cloudflare Turnstile 人机验证，无需邮件验证码）
  */
-app.post('/api/auth/send-code', sendCodeLimiter, async function(req, res) {
+app.post('/api/auth/register', registerLimiter, async function(req, res) {
     try {
         var name = (req.body.name || '').trim();
         var email = (req.body.email || '').trim();
         var password = req.body.password;
+        var turnstileToken = (req.body.turnstileToken || '').trim();
 
         if (!name || !email || !password) {
             return res.status(400).json({ success: false, message: '请填写所有字段', message_en: 'Please fill in all fields' });
@@ -357,6 +387,12 @@ app.post('/api/auth/send-code', sendCodeLimiter, async function(req, res) {
             return res.status(400).json({ success: false, message: '用户名不能超过50个字符', message_en: 'Username cannot exceed 50 characters' });
         }
 
+        // Cloudflare Turnstile 人机验证
+        var turnstileOk = await verifyTurnstileToken(turnstileToken, req.ip || '');
+        if (!turnstileOk) {
+            return res.status(403).json({ success: false, message: '人机验证失败，请重试', message_en: 'Human verification failed, please try again' });
+        }
+
         // 检查邮箱是否已注册
         var stmt = db.prepare('SELECT id FROM users WHERE email = ?');
         stmt.bind([email]);
@@ -366,90 +402,9 @@ app.post('/api/auth/send-code', sendCodeLimiter, async function(req, res) {
         }
         stmt.free();
 
-        if (!mailerTransport) {
-            return res.status(503).json({ success: false, message: '邮件服务暂不可用，请联系管理员', message_en: 'Email service is unavailable, please contact the administrator' });
-        }
-
-        var code = generateVerificationCode();
-        // 对密码哈希后存入待验证队列（避免明文密码在内存停留过久）
+        // 对密码进行哈希
         var salt = await bcrypt.genSalt(10);
         var hashedPassword = await bcrypt.hash(password, salt);
-        // 若该邮箱已有未过期验证码且发送时间不足冷却期，拒绝重复发送
-        var existing = pendingVerifications[email];
-        if (existing && Date.now() <= existing.expiresAt && existing.sentAt && Date.now() - existing.sentAt < RESEND_COOLDOWN_MS) {
-            var waitSec = Math.ceil((RESEND_COOLDOWN_MS - (Date.now() - existing.sentAt)) / 1000);
-            return res.status(429).json({ success: false, message: '请等待 ' + waitSec + ' 秒后再重新发送', message_en: 'Please wait ' + waitSec + ' seconds before resending' });
-        }
-        pendingVerifications[email] = {
-            code: code,
-            name: name,
-            hashedPassword: hashedPassword,
-            sentAt: Date.now(),
-            expiresAt: Date.now() + CODE_EXPIRE_MS
-        };
-
-        await sendVerificationEmail(email, name, code);
-        console.log('已发送注册验证码至:', email);
-
-        res.json({
-            success: true,
-            message: '验证码已发送至您的邮箱，请在10分钟内完成注册',
-            message_en: 'Verification code sent to your email. Please complete registration within 10 minutes.'
-        });
-    } catch (err) {
-        console.error('发送验证码错误:', err);
-        res.status(500).json({ success: false, message: '发送验证码失败，请稍后重试', message_en: 'Failed to send verification code, please try again later' });
-    }
-});
-
-/**
- * POST /api/auth/register - 用户注册（需要验证码）
- */
-app.post('/api/auth/register', registerLimiter, async function(req, res) {
-    try {
-        var name = (req.body.name || '').trim();
-        var email = (req.body.email || '').trim();
-        var password = req.body.password;
-        var code = (req.body.code || '').trim();
-
-        if (!name || !email || !password || !code) {
-            return res.status(400).json({ success: false, message: '请填写所有字段', message_en: 'Please fill in all fields' });
-        }
-        if (!isValidEmail(email)) {
-            return res.status(400).json({ success: false, message: '邮箱格式不正确', message_en: 'Invalid email format' });
-        }
-        if (!isValidPassword(password)) {
-            return res.status(400).json({ success: false, message: '密码须至少8位，包含字母和特殊符号', message_en: 'Password must be at least 8 characters and contain letters and special characters' });
-        }
-        if (name.length > 50) {
-            return res.status(400).json({ success: false, message: '用户名不能超过50个字符', message_en: 'Username cannot exceed 50 characters' });
-        }
-
-        // 验证验证码
-        var pending = pendingVerifications[email];
-        if (!pending) {
-            return res.status(400).json({ success: false, message: '请先获取验证码', message_en: 'Please request a verification code first' });
-        }
-        if (Date.now() > pending.expiresAt) {
-            delete pendingVerifications[email];
-            return res.status(400).json({ success: false, message: '验证码已过期，请重新获取', message_en: 'Verification code expired, please request a new one' });
-        }
-        if (pending.code !== code) {
-            return res.status(400).json({ success: false, message: '验证码错误', message_en: 'Incorrect verification code' });
-        }
-
-        // 检查邮箱是否已注册
-        var stmt = db.prepare('SELECT id FROM users WHERE email = ?');
-        stmt.bind([email]);
-        if (stmt.step()) {
-            stmt.free();
-            delete pendingVerifications[email];
-            return res.status(409).json({ success: false, message: '该邮箱已注册', message_en: 'This email is already registered' });
-        }
-        stmt.free();
-
-        // 使用已哈希的密码（来自发送验证码时）
-        var hashedPassword = pending.hashedPassword;
 
         db.run('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [name, email, hashedPassword]);
 
@@ -458,9 +413,6 @@ app.post('/api/auth/register', registerLimiter, async function(req, res) {
 
         var token = generateToken();
         db.run('INSERT INTO tokens (user_id, token, expires_at) VALUES (?, ?, ?)', [userId, token, getExpiresAt()]);
-
-        // 注册成功，清除验证码记录
-        delete pendingVerifications[email];
 
         saveDatabase();
         console.log('新用户注册:', email);
@@ -479,15 +431,22 @@ app.post('/api/auth/register', registerLimiter, async function(req, res) {
 });
 
 /**
- * POST /api/auth/login - 用户登录
+ * POST /api/auth/login - 用户登录（使用 Cloudflare Turnstile 人机验证）
  */
 app.post('/api/auth/login', loginLimiter, async function(req, res) {
     try {
         var email = req.body.email;
         var password = req.body.password;
+        var turnstileToken = (req.body.turnstileToken || '').trim();
 
         if (!email || !password) {
             return res.status(400).json({ success: false, message: '请填写所有字段', message_en: 'Please fill in all fields' });
+        }
+
+        // Cloudflare Turnstile 人机验证
+        var turnstileOk = await verifyTurnstileToken(turnstileToken, req.ip || '');
+        if (!turnstileOk) {
+            return res.status(403).json({ success: false, message: '人机验证失败，请重试', message_en: 'Human verification failed, please try again' });
         }
 
         var stmt = db.prepare('SELECT id, name, email, password FROM users WHERE email = ?');
