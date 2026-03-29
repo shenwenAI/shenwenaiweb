@@ -335,8 +335,8 @@ setInterval(function() {
     }
 }, 10 * 60 * 1000);
 
-// 修改密码: 每个 IP 每10分钟最多5次
-var changePasswordLimiter = rateLimit(5, 10 * 60 * 1000);
+// 修改密码: 每个 IP 每10分钟最多3次
+var changePasswordLimiter = rateLimit(3, 10 * 60 * 1000);
 // 登录: 每个 IP 每15分钟最多10次尝试
 var loginLimiter = rateLimit(10, 15 * 60 * 1000);
 // 注册: 每个 IP 每小时最多5次
@@ -562,6 +562,7 @@ app.post('/api/auth/change-password', changePasswordLimiter, async function(req,
         // 验证当前密码
         var isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) {
+            console.warn('修改密码失败（密码错误）:', user.email, 'IP:', req.ip);
             return res.status(400).json({ success: false, message: '当前密码不正确', message_en: 'Current password is incorrect' });
         }
 
