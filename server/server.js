@@ -205,12 +205,18 @@ app.set('trust proxy', true);
 // JSON 解析（限制请求体大小，防止超大请求攻击）
 app.use(express.json({ limit: '1mb' }));
 
-// 安全响应头
+// 安全响应头 + 防止 Cloudflare CDN 缓存 API 响应
 app.use(function(req, res, next) {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('X-XSS-Protection', '1; mode=block');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    // 防止 Cloudflare CDN 缓存 API 响应（避免缓存的 CORS 头导致跨域错误）
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('CDN-Cache-Control', 'no-store');
+    res.setHeader('Surrogate-Control', 'no-store');
+    // 确保 Cloudflare 按不同 Origin 缓存（即使不缓存也应设置，作为安全保障）
+    res.setHeader('Vary', 'Origin');
     next();
 });
 

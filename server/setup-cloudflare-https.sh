@@ -173,10 +173,14 @@ server {
 
         proxy_cache_bypass \$http_upgrade;
 
-        # 超时设置
-        proxy_connect_timeout 60s;
-        proxy_send_timeout 60s;
-        proxy_read_timeout 60s;
+        # 超时设置（防止 Cloudflare 524 超时错误）
+        proxy_connect_timeout 10s;
+        proxy_send_timeout 30s;
+        proxy_read_timeout 30s;
+
+        # 禁止 Nginx 缓存 API 响应
+        proxy_no_cache 1;
+        proxy_cache_bypass 1;
     }
 
     # ---------- 根路径 - 服务状态 ----------
