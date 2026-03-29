@@ -540,8 +540,6 @@ console.log(data.choices[0].message);`
     });
 
     // ==================== 后端 API 地址 ====================
-    // 部署后端后，将此地址改为你的服务器地址，例如：
-    // var AUTH_API_URL = 'https://shenwenapi.578388.xyz';
     var AUTH_API_URL = 'https://shenwenapi.578388.xyz';
 
     // ==================== 获取API处理 ====================
@@ -630,7 +628,11 @@ console.log(data.choices[0].message);`
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: email, password: password })
                 })
-                .then(function(response) { return response.json(); })
+                .then(function(response) {
+                    return response.json().catch(function() {
+                        throw new Error('server-error-' + response.status);
+                    });
+                })
                 .then(function(data) {
                     if (data.success) {
                         // 保存 token 和用户信息（不保存密码）
@@ -646,7 +648,11 @@ console.log(data.choices[0].message);`
                 })
                 .catch(function(err) {
                     console.error('登录请求失败:', err);
-                    showAuthMessage('loginMessage', isEnglish ? 'Network error, please try again' : '网络错误，请稍后重试', 'error');
+                    if (err.message && err.message.startsWith('server-error-')) {
+                        showAuthMessage('loginMessage', isEnglish ? 'Server error, please try again later' : '服务器错误，请稍后重试', 'error');
+                    } else {
+                        showAuthMessage('loginMessage', isEnglish ? 'Network error, please check your connection and try again' : '网络错误，请检查网络连接后重试', 'error');
+                    }
                 })
                 .finally(function() {
                     submitBtn.disabled = false;
@@ -691,7 +697,11 @@ console.log(data.choices[0].message);`
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name: name, email: email, password: password })
                     })
-                    .then(function(response) { return response.json(); })
+                    .then(function(response) {
+                        return response.json().catch(function() {
+                            throw new Error('server-error-' + response.status);
+                        });
+                    })
                     .then(function(data) {
                         if (data.success) {
                             showAuthMessage('registerMessage', isEnglish ? (data.message_en || 'Verification code sent!') : (data.message || '验证码已发送！'), 'success');
@@ -725,7 +735,11 @@ console.log(data.choices[0].message);`
                         console.error('发送验证码请求失败:', err);
                         sendCodeBtn.disabled = false;
                         sendCodeBtn.textContent = originalText;
-                        showAuthMessage('registerMessage', isEnglish ? 'Network error, please try again' : '网络错误，请稍后重试', 'error');
+                        if (err.message && err.message.startsWith('server-error-')) {
+                            showAuthMessage('registerMessage', isEnglish ? 'Server error, please try again later' : '服务器错误，请稍后重试', 'error');
+                        } else {
+                            showAuthMessage('registerMessage', isEnglish ? 'Network error, please check your connection and try again' : '网络错误，请检查网络连接后重试', 'error');
+                        }
                     });
                 });
             }
@@ -769,7 +783,11 @@ console.log(data.choices[0].message);`
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name: name, email: email, password: password, code: code })
                 })
-                .then(function(response) { return response.json(); })
+                .then(function(response) {
+                    return response.json().catch(function() {
+                        throw new Error('server-error-' + response.status);
+                    });
+                })
                 .then(function(data) {
                     if (data.success) {
                         // 保存 token 和用户信息（不保存密码）
@@ -788,7 +806,11 @@ console.log(data.choices[0].message);`
                 })
                 .catch(function(err) {
                     console.error('注册请求失败:', err);
-                    showAuthMessage('registerMessage', isEnglish ? 'Network error, please try again' : '网络错误，请稍后重试', 'error');
+                    if (err.message && err.message.startsWith('server-error-')) {
+                        showAuthMessage('registerMessage', isEnglish ? 'Server error, please try again later' : '服务器错误，请稍后重试', 'error');
+                    } else {
+                        showAuthMessage('registerMessage', isEnglish ? 'Network error, please check your connection and try again' : '网络错误，请检查网络连接后重试', 'error');
+                    }
                 })
                 .finally(function() {
                     submitBtn.disabled = false;
