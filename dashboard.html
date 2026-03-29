@@ -127,8 +127,12 @@
                         </svg>
                         <h2>修改密码</h2>
                     </div>
-                    <p class="dashboard-card-desc">修改密码将发送验证码到您的注册邮箱。密码须至少8位，包含字母和特殊符号。</p>
+                    <p class="dashboard-card-desc">密码须至少8位，包含字母和特殊符号。</p>
                     <form id="changePwForm" class="dashboard-form">
+                        <div class="form-group">
+                            <label for="changePwCurrent">当前密码</label>
+                            <input type="password" id="changePwCurrent" placeholder="请输入当前密码" required autocomplete="current-password">
+                        </div>
                         <div class="form-group">
                             <label for="changePwNew">新密码</label>
                             <input type="password" id="changePwNew" placeholder="请输入新密码（至少8位，含字母和特殊符号）" required minlength="8" autocomplete="new-password">
@@ -137,14 +141,9 @@
                             <label for="changePwConfirm">确认新密码</label>
                             <input type="password" id="changePwConfirm" placeholder="请再次输入新密码" required minlength="8" autocomplete="new-password">
                         </div>
-                        <div class="form-group verify-code-group" id="changePwCodeGroup" style="display:none;">
-                            <label for="changePwCode">邮件验证码</label>
-                            <input type="text" id="changePwCode" placeholder="请输入邮件中的6位验证码" maxlength="6" autocomplete="one-time-code">
-                        </div>
                         <div id="changePwMessage" class="auth-message" style="display:none;"></div>
                         <div class="dashboard-form-actions">
-                            <button type="button" class="btn btn-primary" id="sendChangePwCodeBtn">发送验证码</button>
-                            <button type="submit" class="btn btn-primary" id="changePwSubmitBtn" style="display:none;">保存新密码</button>
+                            <button type="submit" class="btn btn-primary" id="changePwSubmitBtn">保存新密码</button>
                         </div>
                     </form>
                 </div>
