@@ -544,6 +544,28 @@ console.log(data.choices[0].message);`
     // var AUTH_API_URL = 'https://shenwenapi.578388.xyz';
     var AUTH_API_URL = 'https://shenwenapi.578388.xyz';
 
+    // ==================== API 响应处理 ====================
+    function handleApiResponse(response) {
+        return response.text().then(function(text) {
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                if (!response.ok) {
+                    return { success: false, message: '服务器错误 (' + response.status + ')', message_en: 'Server error (' + response.status + ')' };
+                }
+                return { success: false, message: '服务器响应格式错误', message_en: 'Invalid server response' };
+            }
+        });
+    }
+
+    function getNetworkErrorMessage(err, isEnglish) {
+        var msg = err && err.message ? err.message : '';
+        if (msg.indexOf('Failed to fetch') !== -1 || msg.indexOf('NetworkError') !== -1 || msg.indexOf('Network request failed') !== -1) {
+            return isEnglish ? 'Unable to connect to server, please check your network and try again' : '无法连接到服务器，请检查网络后重试';
+        }
+        return isEnglish ? 'Network error, please try again' : '网络错误，请稍后重试';
+    }
+
     // ==================== 获取API处理 ====================
     function initGetApiHandler() {
         window.handleGetApi = function() {
@@ -630,10 +652,9 @@ console.log(data.choices[0].message);`
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: email, password: password })
                 })
-                .then(function(response) { return response.json(); })
+                .then(handleApiResponse)
                 .then(function(data) {
                     if (data.success) {
-                        // 保存 token 和用户信息（不保存密码）
                         localStorage.setItem('shenwenai_token', data.token);
                         localStorage.setItem('shenwenai_user', JSON.stringify(data.user));
                         showAuthMessage('loginMessage', isEnglish ? (data.message_en || 'Login successful! Redirecting...') : (data.message || '登录成功！正在跳转...'), 'success');
@@ -646,7 +667,7 @@ console.log(data.choices[0].message);`
                 })
                 .catch(function(err) {
                     console.error('登录请求失败:', err);
-                    showAuthMessage('loginMessage', isEnglish ? 'Network error, please try again' : '网络错误，请稍后重试', 'error');
+                    showAuthMessage('loginMessage', getNetworkErrorMessage(err, isEnglish), 'error');
                 })
                 .finally(function() {
                     submitBtn.disabled = false;
@@ -691,7 +712,7 @@ console.log(data.choices[0].message);`
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name: name, email: email, password: password })
                     })
-                    .then(function(response) { return response.json(); })
+                    .then(handleApiResponse)
                     .then(function(data) {
                         if (data.success) {
                             showAuthMessage('registerMessage', isEnglish ? (data.message_en || 'Verification code sent!') : (data.message || '验证码已发送！'), 'success');
@@ -725,7 +746,7 @@ console.log(data.choices[0].message);`
                         console.error('发送验证码请求失败:', err);
                         sendCodeBtn.disabled = false;
                         sendCodeBtn.textContent = originalText;
-                        showAuthMessage('registerMessage', isEnglish ? 'Network error, please try again' : '网络错误，请稍后重试', 'error');
+                        showAuthMessage('registerMessage', getNetworkErrorMessage(err, isEnglish), 'error');
                     });
                 });
             }
@@ -769,10 +790,9 @@ console.log(data.choices[0].message);`
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name: name, email: email, password: password, code: code })
                 })
-                .then(function(response) { return response.json(); })
+                .then(handleApiResponse)
                 .then(function(data) {
                     if (data.success) {
-                        // 保存 token 和用户信息（不保存密码）
                         localStorage.setItem('shenwenai_token', data.token);
                         localStorage.setItem('shenwenai_user', JSON.stringify(data.user));
                         var successMsg = isEnglish
@@ -788,7 +808,7 @@ console.log(data.choices[0].message);`
                 })
                 .catch(function(err) {
                     console.error('注册请求失败:', err);
-                    showAuthMessage('registerMessage', isEnglish ? 'Network error, please try again' : '网络错误，请稍后重试', 'error');
+                    showAuthMessage('registerMessage', getNetworkErrorMessage(err, isEnglish), 'error');
                 })
                 .finally(function() {
                     submitBtn.disabled = false;
@@ -824,7 +844,7 @@ console.log(data.choices[0].message);`
         fetch(AUTH_API_URL + '/api/auth/user', {
             headers: { 'Authorization': 'Bearer ' + token }
         })
-        .then(function(r) { return r.json(); })
+        .then(handleApiResponse)
         .then(function(data) {
             if (!data.success) {
                 localStorage.removeItem('shenwenai_token');
@@ -888,7 +908,7 @@ console.log(data.choices[0].message);`
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
                 })
-                .then(function(r) { return r.json(); })
+                .then(handleApiResponse)
                 .then(function(data) {
                     if (data.success) {
                         showAuthMessage('changePwMessage', isEnglish ? (data.message_en || 'Verification code sent!') : (data.message || '验证码已发送！'), 'success');
@@ -915,10 +935,10 @@ console.log(data.choices[0].message);`
                         showAuthMessage('changePwMessage', isEnglish ? (data.message_en || 'Failed to send code') : (data.message || '发送失败'), 'error');
                     }
                 })
-                .catch(function() {
+                .catch(function(err) {
                     sendChangePwCodeBtn.disabled = false;
                     sendChangePwCodeBtn.textContent = originalText;
-                    showAuthMessage('changePwMessage', isEnglish ? 'Network error, please try again' : '网络错误，请稍后重试', 'error');
+                    showAuthMessage('changePwMessage', getNetworkErrorMessage(err, isEnglish), 'error');
                 });
             });
         }
@@ -952,7 +972,7 @@ console.log(data.choices[0].message);`
                     headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
                     body: JSON.stringify({ newPassword: newPassword, code: code })
                 })
-                .then(function(r) { return r.json(); })
+                .then(handleApiResponse)
                 .then(function(data) {
                     if (data.success) {
                         showAuthMessage('changePwMessage', isEnglish ? (data.message_en || 'Password changed successfully!') : (data.message || '密码修改成功！'), 'success');
@@ -965,8 +985,8 @@ console.log(data.choices[0].message);`
                         showAuthMessage('changePwMessage', isEnglish ? (data.message_en || 'Failed to change password') : (data.message || '修改密码失败'), 'error');
                     }
                 })
-                .catch(function() {
-                    showAuthMessage('changePwMessage', isEnglish ? 'Network error, please try again' : '网络错误，请稍后重试', 'error');
+                .catch(function(err) {
+                    showAuthMessage('changePwMessage', getNetworkErrorMessage(err, isEnglish), 'error');
                 })
                 .finally(function() {
                     if (changePwSubmitBtn) { changePwSubmitBtn.disabled = false; changePwSubmitBtn.textContent = originalText; }
@@ -1004,7 +1024,7 @@ console.log(data.choices[0].message);`
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: name, email: email, subject: subject, message: message })
             })
-            .then(function(r) { return r.json(); })
+            .then(handleApiResponse)
             .then(function(data) {
                 if (data.success) {
                     showAuthMessage('contactFormMessage', isEnglish ? (data.message_en || 'Message sent successfully!') : (data.message || '消息已发送！'), 'success');
@@ -1013,8 +1033,8 @@ console.log(data.choices[0].message);`
                     showAuthMessage('contactFormMessage', isEnglish ? (data.message_en || 'Failed to send message') : (data.message || '发送失败'), 'error');
                 }
             })
-            .catch(function() {
-                showAuthMessage('contactFormMessage', isEnglish ? 'Network error, please try again' : '网络错误，请稍后重试', 'error');
+            .catch(function(err) {
+                showAuthMessage('contactFormMessage', getNetworkErrorMessage(err, isEnglish), 'error');
             })
             .finally(function() {
                 submitBtn.disabled = false;
