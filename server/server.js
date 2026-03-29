@@ -222,7 +222,7 @@ function matchCorsOrigin(origin) {
         if (allowed === '*' || allowed === origin) return true;
         // 支持通配符子域名匹配，如 https://*.example.com
         if (allowed.indexOf('*') !== -1) {
-            var pattern = allowed.replace(/\./g, '\\.').replace(/\*/g, '[a-zA-Z0-9-]+');
+            var pattern = allowed.replace(/\./g, '\\.').replace(/\*/g, '[a-zA-Z0-9.-]+');
             if (new RegExp('^' + pattern + '$').test(origin)) return true;
         }
     }
