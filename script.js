@@ -545,6 +545,22 @@ console.log(data.choices[0].message);`
     // var AUTH_API_URL = 'https://shenwenapi.578388.xyz';
     var AUTH_API_URL = 'https://shenwenapi.578388.xyz';
 
+    // ==================== SHA256 加密工具 ====================
+    /**
+     * 使用 Web Crypto API 计算 SHA-256 哈希
+     * @param {string} message - 要哈希的字符串
+     * @returns {Promise<string>} - 返回十六进制格式的哈希值
+     */
+    function sha256(message) {
+        var encoder = new TextEncoder();
+        var data = encoder.encode(message);
+        return crypto.subtle.digest('SHA-256', data).then(function(hash) {
+            return Array.from(new Uint8Array(hash)).map(function(b) {
+                return b.toString(16).padStart(2, '0');
+            }).join('');
+        });
+    }
+
     // ==================== API 响应处理 ====================
     // Cloudflare CDN 特殊状态码（520-527 表示源站问题）
     var CLOUDFLARE_ERROR_CODES = {
@@ -740,10 +756,13 @@ console.log(data.choices[0].message);`
                 submitBtn.disabled = true;
                 submitBtn.textContent = isEnglish ? 'Logging in...' : '登录中...';
 
-                fetchWithTimeout(AUTH_API_URL + '/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email, password: password, captchaId: loginCaptchaId, captchaCode: captchaCode })
+                // SHA256 加密密码后发送
+                sha256(password).then(function(hashedPassword) {
+                    return fetchWithTimeout(AUTH_API_URL + '/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: email, password: hashedPassword, captchaId: loginCaptchaId, captchaCode: captchaCode })
+                    });
                 })
                 .then(handleApiResponse)
                 .then(function(data) {
@@ -808,10 +827,15 @@ console.log(data.choices[0].message);`
                 submitBtn.disabled = true;
                 submitBtn.textContent = isEnglish ? 'Registering...' : '注册中...';
 
-                fetchWithTimeout(AUTH_API_URL + '/api/auth/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: name, email: email, password: password, captchaId: registerCaptchaId, captchaCode: captchaCode })
+                // SHA256 加密密码和账号名后发送
+                Promise.all([sha256(password), sha256(name)]).then(function(hashes) {
+                    var hashedPassword = hashes[0];
+                    var hashedName = hashes[1];
+                    return fetchWithTimeout(AUTH_API_URL + '/api/auth/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: hashedName, email: email, password: hashedPassword, captchaId: registerCaptchaId, captchaCode: captchaCode })
+                    });
                 })
                 .then(handleApiResponse)
                 .then(function(data) {
@@ -945,10 +969,15 @@ console.log(data.choices[0].message);`
                 var originalText = changePwSubmitBtn ? changePwSubmitBtn.textContent : '';
                 if (changePwSubmitBtn) { changePwSubmitBtn.disabled = true; changePwSubmitBtn.textContent = isEnglish ? 'Saving...' : '保存中...'; }
 
-                fetchWithTimeout(AUTH_API_URL + '/api/auth/change-password', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ currentPassword: currentPassword, newPassword: newPassword })
+                // SHA256 加密密码后发送
+                Promise.all([sha256(currentPassword), sha256(newPassword)]).then(function(hashes) {
+                    var hashedCurrentPassword = hashes[0];
+                    var hashedNewPassword = hashes[1];
+                    return fetchWithTimeout(AUTH_API_URL + '/api/auth/change-password', {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ currentPassword: hashedCurrentPassword, newPassword: hashedNewPassword })
+                    });
                 })
                 .then(handleApiResponse)
                 .then(function(data) {
@@ -988,10 +1017,13 @@ console.log(data.choices[0].message);`
                 var originalText = submitBtn ? submitBtn.textContent : '';
                 if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = isEnglish ? 'Deleting...' : '删除中...'; }
 
-                fetchWithTimeout(AUTH_API_URL + '/api/auth/delete-account', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: password })
+                // SHA256 加密密码后发送
+                sha256(password).then(function(hashedPassword) {
+                    return fetchWithTimeout(AUTH_API_URL + '/api/auth/delete-account', {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password: hashedPassword })
+                    });
                 })
                 .then(handleApiResponse)
                 .then(function(data) {
