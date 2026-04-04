@@ -260,13 +260,17 @@ function isValidEmail(email) {
 }
 
 /**
- * 验证密码强度：至少8位，包含字母和特殊符号（非空白非字母数字字符）
+ * 验证是否为合法的 SHA256 哈希值（64位十六进制字符串）
+ */
+function isValidSha256(str) {
+    return typeof str === 'string' && /^[a-f0-9]{64}$/.test(str);
+}
+
+/**
+ * 验证密码格式：前端已用 SHA256 加密密码，服务端接收的是 SHA256 哈希值
  */
 function isValidPassword(password) {
-    if (!password || password.length < 8) return false;
-    if (!/[a-zA-Z]/.test(password)) return false;
-    if (!/[^a-zA-Z0-9\s]/.test(password)) return false;
-    return true;
+    return isValidSha256(password);
 }
 
 function getExpiresAt() {
@@ -378,10 +382,10 @@ app.post('/api/auth/register', registerLimiter, async function(req, res) {
             return res.status(400).json({ success: false, message: '邮箱格式不正确', message_en: 'Invalid email format' });
         }
         if (!isValidPassword(password)) {
-            return res.status(400).json({ success: false, message: '密码须至少8位，包含字母和特殊符号', message_en: 'Password must be at least 8 characters and contain letters and special characters' });
+            return res.status(400).json({ success: false, message: '密码格式不正确', message_en: 'Invalid password format' });
         }
-        if (name.length > 50) {
-            return res.status(400).json({ success: false, message: '用户名不能超过50个字符', message_en: 'Username cannot exceed 50 characters' });
+        if (!isValidSha256(name)) {
+            return res.status(400).json({ success: false, message: '账号名格式不正确', message_en: 'Invalid account name format' });
         }
 
         // 图形验证码验证
@@ -608,7 +612,7 @@ app.post('/api/auth/change-password', changePasswordLimiter, async function(req,
             return res.status(400).json({ success: false, message: '请填写所有字段', message_en: 'Please fill in all fields' });
         }
         if (!isValidPassword(newPassword)) {
-            return res.status(400).json({ success: false, message: '密码须至少8位，包含字母和特殊符号', message_en: 'Password must be at least 8 characters and contain letters and special characters' });
+            return res.status(400).json({ success: false, message: '密码格式不正确', message_en: 'Invalid password format' });
         }
 
         // 验证当前密码
