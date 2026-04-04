@@ -34,6 +34,34 @@ target/
 .DS_Store
 Thumbs.db
 
+# Python specific
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg-info/
+.eggs/
+venv/
+.venv/
+
+# Coverage and test caches
+.coverage
+coverage/
+htmlcov/
+.mypy_cache/
+.pytest_cache/
+
+# Compiled artifacts
+*.o
+*.obj
+*.class
+*.exe
+*.dll
+*.a
+*.out
+
 # Compression files
 *.zip
 *.gz
