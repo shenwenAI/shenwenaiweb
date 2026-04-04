@@ -489,8 +489,8 @@ console.log(data.choices[0].message);`
 
         const isEnglish = document.documentElement.lang === 'en';
         const licenseText = isEnglish
-            ? 'MIT License\n\nCopyright (c) shenwenAI\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software.'
-            : 'MIT 许可证\n\nCopyright (c) shenwenAI\n\n特此免费授予获得本软件及相关文档文件（"软件"）副本的任何人不受限制地处理本软件的权利，包括但不限于使用、复制、修改、合并、发布、分发、再许可和/或销售本软件的副本的权利。';
+            ? 'GNU General Public License v3.0\n\nCopyright (c) shenwenAI\n\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.'
+            : 'GNU 通用公共许可证 第三版\n\nCopyright (c) shenwenAI\n\n本程序是自由软件：你可以根据自由软件基金会发布的 GNU 通用公共许可证的条款重新分发和/或修改它，可以使用许可证的第三版，或者（由你选择）任何更新的版本。\n\n本程序的发布是希望它有用，但不提供任何保证；甚至没有对适销性或特定用途适用性的暗示保证。详见 GNU 通用公共许可证。\n\n你应该已收到本程序附带的 GNU 通用公共许可证副本。如果没有，请参阅 <https://www.gnu.org/licenses/>。';
 
         let charIndex = 0;
         const speed = 30;
