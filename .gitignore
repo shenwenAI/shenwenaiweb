@@ -1,0 +1,14 @@
+# Node.js
+server/node_modules/
+server/data/
+
+# Environment
+server/.env
+server/.env.backup.*
+
+# Generated files
+server/dns-records.txt
+
+# OS files
+.DS_Store
+Thumbs.db

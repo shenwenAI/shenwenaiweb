@@ -529,6 +529,58 @@ app.post('/api/auth/logout', function(req, res) {
 });
 
 /**
+ * POST /api/auth/delete-account - 注销账号（需要登录验证）
+ */
+app.post('/api/auth/delete-account', changePasswordLimiter, async function(req, res) {
+    try {
+        var authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ success: false, message: '未登录', message_en: 'Not logged in' });
+        }
+        var token = authHeader.slice(7);
+        var stmt = db.prepare(
+            'SELECT users.id, users.name, users.email, users.password FROM tokens JOIN users ON tokens.user_id = users.id WHERE tokens.token = ? AND tokens.expires_at > datetime(?)'
+        );
+        stmt.bind([token, new Date().toISOString()]);
+        if (!stmt.step()) {
+            stmt.free();
+            return res.status(401).json({ success: false, message: '登录已过期，请重新登录', message_en: 'Session expired, please log in again' });
+        }
+        var user = stmt.getAsObject();
+        stmt.free();
+
+        var password = (req.body.password || '').trim();
+        if (!password) {
+            return res.status(400).json({ success: false, message: '请输入密码确认操作', message_en: 'Please enter password to confirm' });
+        }
+
+        // 验证密码
+        var isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            console.warn('注销账号失败（密码错误）:', user.email, 'IP:', req.ip);
+            return res.status(400).json({ success: false, message: '密码不正确', message_en: 'Incorrect password' });
+        }
+
+        // 删除用户相关的所有 token
+        db.run('DELETE FROM tokens WHERE user_id = ?', [user.id]);
+        // 删除用户
+        db.run('DELETE FROM users WHERE id = ?', [user.id]);
+
+        saveDatabase();
+        console.log('用户注销账号:', user.email);
+
+        res.json({
+            success: true,
+            message: '账号已成功注销',
+            message_en: 'Account deleted successfully'
+        });
+    } catch (err) {
+        console.error('注销账号错误:', err);
+        res.status(500).json({ success: false, message: '服务器错误，请稍后重试', message_en: 'Server error, please try again later' });
+    }
+});
+
+/**
  * POST /api/auth/change-password - 修改密码（需要登录和当前密码）
  */
 app.post('/api/auth/change-password', changePasswordLimiter, async function(req, res) {

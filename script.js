@@ -967,6 +967,53 @@ console.log(data.choices[0].message);`
                 });
             });
         }
+
+        // 注销账号
+        var deleteAccountForm = document.getElementById('deleteAccountForm');
+        if (deleteAccountForm) {
+            deleteAccountForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var password = document.getElementById('deleteAccountPassword') ? document.getElementById('deleteAccountPassword').value : '';
+                var submitBtn = document.getElementById('deleteAccountSubmitBtn');
+
+                if (!password) {
+                    showAuthMessage('deleteAccountMessage', isEnglish ? 'Please enter your password' : '请输入密码', 'error');
+                    return;
+                }
+
+                if (!confirm(isEnglish ? 'Are you sure you want to delete your account? This action cannot be undone.' : '确定要注销账号吗？此操作不可恢复。')) {
+                    return;
+                }
+
+                var originalText = submitBtn ? submitBtn.textContent : '';
+                if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = isEnglish ? 'Deleting...' : '删除中...'; }
+
+                fetchWithTimeout(AUTH_API_URL + '/api/auth/delete-account', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: password })
+                })
+                .then(handleApiResponse)
+                .then(function(data) {
+                    if (data.success) {
+                        showAuthMessage('deleteAccountMessage', isEnglish ? (data.message_en || 'Account deleted successfully') : (data.message || '账号已成功注销'), 'success');
+                        localStorage.removeItem('shenwenai_token');
+                        localStorage.removeItem('shenwenai_user');
+                        setTimeout(function() {
+                            window.location.href = isEnglish ? 'login-en.html' : 'login.html';
+                        }, 2000);
+                    } else {
+                        showAuthMessage('deleteAccountMessage', isEnglish ? (data.message_en || 'Failed to delete account') : (data.message || '注销账号失败'), 'error');
+                    }
+                })
+                .catch(function(err) {
+                    showAuthMessage('deleteAccountMessage', getNetworkErrorMessage(err, isEnglish), 'error');
+                })
+                .finally(function() {
+                    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = originalText; }
+                });
+            });
+        }
     }
 
     // ==================== 联系表单功能 ====================

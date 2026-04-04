@@ -21,6 +21,7 @@
     --accent-success: #10b981;
     --accent-warning: #f59e0b;
     --accent-error: #ef4444;
+    --accent-danger: #ef4444;
     --accent-purple: #8b5cf6;
 
     /* Shadows */
@@ -337,6 +338,17 @@ html.dark .moon-icon {
 .btn-outline:hover {
     background: var(--brand-primary);
     color: #ffffff;
+}
+
+.btn-danger {
+    background: var(--accent-danger);
+    color: #ffffff;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
 }
 
 .btn-white {
