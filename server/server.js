@@ -267,17 +267,10 @@ function isValidSha256(str) {
 }
 
 /**
- * 验证密码强度：至少8位，包含字母和特殊符号（非空白非字母数字字符）
- * 注意：前端已用 SHA256 加密密码，服务端接收的是 SHA256 哈希值
+ * 验证密码格式：前端已用 SHA256 加密密码，服务端接收的是 SHA256 哈希值
  */
 function isValidPassword(password) {
-    // 前端发送的是 SHA256 哈希值（64位十六进制字符串）
-    if (isValidSha256(password)) return true;
-    // 兼容未加密的密码格式
-    if (!password || password.length < 8) return false;
-    if (!/[a-zA-Z]/.test(password)) return false;
-    if (!/[^a-zA-Z0-9\s]/.test(password)) return false;
-    return true;
+    return isValidSha256(password);
 }
 
 function getExpiresAt() {
@@ -391,8 +384,8 @@ app.post('/api/auth/register', registerLimiter, async function(req, res) {
         if (!isValidPassword(password)) {
             return res.status(400).json({ success: false, message: '密码须至少8位，包含字母和特殊符号', message_en: 'Password must be at least 8 characters and contain letters and special characters' });
         }
-        if (name.length > 64) {
-            return res.status(400).json({ success: false, message: '用户名不能超过64个字符', message_en: 'Username cannot exceed 64 characters' });
+        if (!isValidSha256(name)) {
+            return res.status(400).json({ success: false, message: '账号名格式不正确', message_en: 'Invalid account name format' });
         }
 
         // 图形验证码验证
