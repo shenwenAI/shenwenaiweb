@@ -21,6 +21,7 @@
     --accent-success: #10b981;
     --accent-warning: #f59e0b;
     --accent-error: #ef4444;
+    --accent-danger: #ef4444;
     --accent-purple: #8b5cf6;
 
     /* Shadows */
@@ -251,6 +252,27 @@ html.dark .moon-icon {
     height: 20px;
 }
 
+.twitter-link {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+}
+
+.twitter-link:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.twitter-link svg {
+    width: 20px;
+    height: 20px;
+}
+
 .mobile-menu-toggle {
     display: none;
     flex-direction: column;
@@ -316,6 +338,17 @@ html.dark .moon-icon {
 .btn-outline:hover {
     background: var(--brand-primary);
     color: #ffffff;
+}
+
+.btn-danger {
+    background: var(--accent-danger);
+    color: #ffffff;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
 }
 
 .btn-white {
