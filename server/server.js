@@ -382,7 +382,7 @@ app.post('/api/auth/register', registerLimiter, async function(req, res) {
             return res.status(400).json({ success: false, message: '邮箱格式不正确', message_en: 'Invalid email format' });
         }
         if (!isValidPassword(password)) {
-            return res.status(400).json({ success: false, message: '密码须至少8位，包含字母和特殊符号', message_en: 'Password must be at least 8 characters and contain letters and special characters' });
+            return res.status(400).json({ success: false, message: '密码格式不正确', message_en: 'Invalid password format' });
         }
         if (!isValidSha256(name)) {
             return res.status(400).json({ success: false, message: '账号名格式不正确', message_en: 'Invalid account name format' });
@@ -612,7 +612,7 @@ app.post('/api/auth/change-password', changePasswordLimiter, async function(req,
             return res.status(400).json({ success: false, message: '请填写所有字段', message_en: 'Please fill in all fields' });
         }
         if (!isValidPassword(newPassword)) {
-            return res.status(400).json({ success: false, message: '密码须至少8位，包含字母和特殊符号', message_en: 'Password must be at least 8 characters and contain letters and special characters' });
+            return res.status(400).json({ success: false, message: '密码格式不正确', message_en: 'Invalid password format' });
         }
 
         // 验证当前密码
